@@ -16,7 +16,7 @@ else
     data = data(randperm(size(data, 1)), :); %Randomize data rows
 end
 
-hn1 = 20; %Number of neurons in the first hidden layer
+hn1 = 30; %Number of neurons in the first hidden layer
 
 %divide the dataset into training and testing
 traind = 1100; % Training set
