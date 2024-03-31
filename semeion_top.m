@@ -8,10 +8,11 @@ epochs = 50; %Number of training epochs
 mini_batch_size = 10; %Minibatch size
 hidden_nodes = 20; %Number of neurons in the first hidden layer
 slope = 0.05; %relu slope
+%Code running mode options
+do_training = 1;  %Set 1 for Training. Set 0 if only inference
+load_randomized_data = 1;
 
 disp('Starting ...');
-
-load_randomized_data = 1;
 
 if (load_randomized_data)
     %Load Data from .mat file
@@ -30,12 +31,13 @@ testd = 493; % Testing set
 train_data = data(1:traind,:);
 test_data = data((traind + (1:testd)),:);
 
+if (do_training)  %do training??
 %Training function to get weights and biases and save them
 %comment out the 2 lines below when a desired test accuracy is reached and
 %you want to run only inference.
 [w12,w23,b12,b23] = training(train_data,traind,hidden_nodes, eta, epochs, mini_batch_size);
 save('trained_params.mat','w12','w23','b12','b23');
-
+end
 %Load the saved training parameters
 load('trained_params.mat','w12','w23','b12','b23');
 
