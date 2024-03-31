@@ -1,4 +1,4 @@
-function [outputArg1,outputArg2,outputArg3,outputArg4] = training(data,traind,hn1)
+function [outputArg1,outputArg2,outputArg3,outputArg4] = training(data,traind,hn1, eta, epochs, mini_batch_size)
 %Train the network using backpropagation
 
 %Training Data
@@ -15,21 +15,15 @@ w23 = randn(10,hn1)*sqrt(2/hn1);
 b12 = randn(hn1,1);
 b23 = randn(10,1);
 
-eta = 0.01; %learning rate
-
-epochs = 50; %Number of training epochs
-
-m = 10; %Minibatch size
-
 images1 = images;   %initial value
 
 for k = 1:epochs %Outer epoch loop
     
     batches = 1;
     
-    for j = 1:traind/m 
+    for j = 1:traind/mini_batch_size 
         
-        for i = batches:batches+m-1 %Loop over each minibatch
+        for i = batches:batches+mini_batch_size-1 %Loop over each minibatch
     
             %Feed forward
             a1 = images1(:,i);
@@ -52,7 +46,7 @@ for k = 1:epochs %Outer epoch loop
 
         end
 
-        batches = batches + m;
+        batches = batches + mini_batch_size;
     
     end
     fprintf('Epochs: %d \n', k);

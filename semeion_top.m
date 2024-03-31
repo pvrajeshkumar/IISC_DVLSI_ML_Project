@@ -1,5 +1,13 @@
 %Top Script to Train and Classify Handwritten Digits
 clear all;
+global slope;
+
+%Configuration Parameters
+eta = 0.02; %learning rate
+epochs = 50; %Number of training epochs
+mini_batch_size = 10; %Minibatch size
+hidden_nodes = 20; %Number of neurons in the first hidden layer
+slope = 0.05; %relu slope
 
 disp('Starting ...');
 
@@ -16,8 +24,6 @@ else
     data = data(randperm(size(data, 1)), :); %Randomize data rows
 end
 
-hn1 = 20; %Number of neurons in the first hidden layer
-
 %divide the dataset into training and testing
 traind = 1100; % Training set
 testd = 493; % Testing set
@@ -27,7 +33,7 @@ test_data = data((traind + (1:testd)),:);
 %Training function to get weights and biases and save them
 %comment out the 2 lines below when a desired test accuracy is reached and
 %you want to run only inference.
-[w12,w23,b12,b23] = training(train_data,traind,hn1);
+[w12,w23,b12,b23] = training(train_data,traind,hidden_nodes, eta, epochs, mini_batch_size);
 save('trained_params.mat','w12','w23','b12','b23');
 
 %Load the saved training parameters
