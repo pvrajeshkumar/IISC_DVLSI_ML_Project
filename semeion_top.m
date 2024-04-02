@@ -9,7 +9,8 @@ mini_batch_size = 10; %Minibatch size
 hidden_nodes = 20; %Number of neurons in the first hidden layer
 slope = 0.05; %relu slope
 %Code running mode options
-do_training = 1;  %Set 1 for Training. Set 0 if only inference
+do_training = 0;  %Set 1 for Training. Set 0 if only inference
+use_fixp_inference = 1; %Set 1 for fixedpoint. Set 0 without fixed point inference
 load_randomized_data = 1;
 
 disp('Starting ...');
@@ -42,11 +43,19 @@ end
 load('trained_params.mat','w12','w23','b12','b23');
 
 %Check train data accuracy
-train_accuracy = inference(train_data,traind,w12,w23,b12,b23);
+if (use_fixp_inference)
+    train_accuracy = inference_fixp(train_data,traind,w12,w23,b12,b23);
+else
+    train_accuracy = inference(train_data,traind,w12,w23,b12,b23);
+end
 fprintf('Train Accuracy: %f %% \n',train_accuracy);
 
 %Check test data accuracy
-test_accuracy = inference(test_data,testd,w12,w23,b12,b23);
+if (use_fixp_inference)
+    test_accuracy = inference_fixp(test_data,testd,w12,w23,b12,b23);
+else
+    test_accuracy = inference(test_data,testd,w12,w23,b12,b23);
+end    
 fprintf('Test Accuracy: %f %% \n',test_accuracy);
 
 disp('Done!');
