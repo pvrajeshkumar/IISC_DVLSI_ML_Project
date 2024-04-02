@@ -11,6 +11,7 @@ slope = 0.05; %relu slope
 %Code running mode options
 do_training = 0;  %Set 1 for Training. Set 0 if only inference
 use_fixp_inference = 1; %Set 1 for fixedpoint. Set 0 without fixed point inference
+no_of_test_imgs = 3;  %To test Single or multiple images
 load_randomized_data = 1;
 
 disp('Starting ...');
@@ -60,8 +61,33 @@ fprintf('Test Accuracy: %f %% \n',test_accuracy);
 
 disp('Done!');
 
-%display a sample image
-img_num = 20;
-sample_img_vector = data(img_num,1:256);
-sample_img = reshape(sample_img_vector,[16,16]);
-imshow(sample_img.')
+if ( no_of_test_imgs == 1 )
+    %display a sample image
+    img_num = 20;
+    sample_img_vector = data(img_num,1:256);
+    sample_img = reshape(sample_img_vector,[16,16]);
+    imshow(sample_img.')
+else
+    %display test sample images (This can go for Verilog TestBench)
+    test_imgs= [1, 21, 41, 61, 81, 101, 121, 141, 161, 181];
+    figure
+    tiledlayout(1,no_of_test_imgs)
+    
+    %test the images above
+    for test_imgs_index = 1:no_of_test_imgs
+        nexttile
+        
+        %Get Predicted img from the test_imgs[] 
+        if (use_fixp_inference)
+            test_accuracy = inference_fixp(test_data,test_imgs(test_imgs_index),w12,w23,b12,b23);
+        else
+            test_accuracy = inference(test_data,test_imgs(test_imgs_index),w12,w23,b12,b23);
+        end   
+
+        img_num = test_imgs(test_imgs_index);
+        sample_img_vector = data(img_num,1:256);
+        sample_img = reshape(sample_img_vector,[16,16]);
+        imshow(sample_img.')
+    end
+end
+
