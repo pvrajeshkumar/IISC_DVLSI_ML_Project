@@ -17,23 +17,24 @@ end
 
 success = 0;
 
-    % [w12_fix_float, w12_fix_int, err] = fixedpoint(w12, 11,8,1);
-    % [w23_fix_float, w23_fix_int, err] = fixedpoint(w23, 19,16,1);
-    % [b12_fix_float, b12_fix_int, err] = fixedpoint(b12, 11,8,1);
-    % [b23_fix_float, b23_fix_int, err] = fixedpoint(b23, 35,32,1);
-
     [w12_fix_float, w12_fix_int, err] = fixedpoint(w12, 16,8,1);
     [w23_fix_float, w23_fix_int, err] = fixedpoint(w23, 16,8,1);
     [b12_fix_float, b12_fix_int, err] = fixedpoint(b12, 16,8,1);
     [b23_fix_float, b23_fix_int, err] = fixedpoint(b23, 16,8,1);
 
-%Q point calculations go like this
+
+%Some points for Fixed point calculations
+% Q point calculations go like this
 % Q8 + Q8 = Q8
 % Q16 + Q16 = Q16
 % Q32 + Q32 = Q32
 % Q8 * Q8 = Q16
 % Q16 * Q16 = Q32
 % Q32 * Q32 = Q64
+% Fractional parts calculations with below examples
+% Q16.8 * Q1.0 = Q17.8
+% Q17.8 + Q16.8 = Q17.8
+% Q11.8 * Q17.8 = Q28.16
 %So, do below MUL & ADD accordingly
 
 for i = 1:testd
