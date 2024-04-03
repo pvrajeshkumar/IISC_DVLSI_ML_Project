@@ -6,12 +6,12 @@ global slope;
 eta = 0.02; %learning rate
 epochs = 50; %Number of training epochs
 mini_batch_size = 10; %Minibatch size
-hidden_nodes = 20; %Number of neurons in the first hidden layer
+hidden_nodes = 40; %Number of neurons in the first hidden layer
 slope = 0.05; %relu slope
 %Code running mode options
 do_training = 0;  %Set 1 for Training. Set 0 if only inference
 use_fixp_inference = 1; %Set 1 for fixedpoint. Set 0 without fixed point inference
-no_of_test_imgs = 3;  %To test Single or multiple images
+no_of_test_imgs = 10;  %To test Single or multiple images
 load_randomized_data = 1;
 
 disp('Starting ...');

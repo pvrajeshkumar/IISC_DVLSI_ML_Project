@@ -17,10 +17,15 @@ end
 
 success = 0;
 
-    [w12_fix_float, w12_fix_int, err] = fixedpoint(w12, 11,8,1);
-    [w23_fix_float, w23_fix_int, err] = fixedpoint(w23, 19,16,1);
-    [b12_fix_float, b12_fix_int, err] = fixedpoint(b12, 11,8,1);
-    [b23_fix_float, b23_fix_int, err] = fixedpoint(b23, 35,32,1);
+    % [w12_fix_float, w12_fix_int, err] = fixedpoint(w12, 11,8,1);
+    % [w23_fix_float, w23_fix_int, err] = fixedpoint(w23, 19,16,1);
+    % [b12_fix_float, b12_fix_int, err] = fixedpoint(b12, 11,8,1);
+    % [b23_fix_float, b23_fix_int, err] = fixedpoint(b23, 35,32,1);
+
+    [w12_fix_float, w12_fix_int, err] = fixedpoint(w12, 16,8,1);
+    [w23_fix_float, w23_fix_int, err] = fixedpoint(w23, 16,8,1);
+    [b12_fix_float, b12_fix_int, err] = fixedpoint(b12, 16,8,1);
+    [b23_fix_float, b23_fix_int, err] = fixedpoint(b23, 16,8,1);
 
 %Q point calculations go like this
 % Q8 + Q8 = Q8
@@ -39,16 +44,18 @@ for i = 1:testd
     %Convert below to Fixed Point Representation
     % z2 = w12_fix_int*a1 + b12;
     % a2 = leaky_relu(z2);
-    z2_interim = w12_fix_int * a1; % Q8. Interim var for fixed point conv
-    z2 = z2_interim + b12_fix_int;
+    z2_interim = w12_fix_int * a1; % (Q16.8 * Q1.0 = Q17.8). Interim var for fixed point conv
+    z2 = z2_interim + b12_fix_int; % Q17.8 + Q16.8 = Q17.8
     %Apply RELU with Fixed point representation
-    a2 = leaky_relu_fixp(z2);
+    a2 = leaky_relu_fixp(z2);  % Q11.8 * Q17.8 = Q28.16
 
     %Convert below to Fixed Point Representation
     % z3 = w23*a2 + b23;
     % a3 = leaky_relu(z3); %Output vector
-    z3_interim = w23_fix_int * a2; % Q8. Interim var for fixed point conv
-    z3 = z3_interim + b23_fix_int;
+    z3_interim = w23_fix_int * a2; % (Q16.8 * Q28.16 = Q44.24). Interim var for fixed point conv
+    %b23_fix_int_inz3_interim Q Point
+    b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
+    z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
     %Apply RELU with Fixed point representation
     a3 = leaky_relu_fixp(z3);
 

@@ -1,0 +1,7 @@
+semeion_top.asv
+fixed_point_inference/fixedpoint.m
+fixed_point_inference/grad_leaky_relu.m
+fixed_point_inference/inference.m
+fixed_point_inference/leaky_relu.m
+fixed_point_inference/semeion_top.m
+fixed_point_inference/trained_params.mat

@@ -11,7 +11,7 @@ if(totalbits>=(fractionbits+1))
  inputArgInteger(find((abs(inputArgInteger))>(2^integerbits-1))) = 0;
  outputargfixedinteger = inputArgInteger*(2^fractionbits) + floor(inputArgFraction*(2^fractionbits));
  inputarg1fixedfloat = outputargfixedinteger/(2^fractionbits);
- 
+
 else
     outputfixedfloat = 0;
     outputargfixedinteger = 0;
