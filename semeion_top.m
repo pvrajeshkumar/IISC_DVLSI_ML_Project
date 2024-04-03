@@ -61,6 +61,9 @@ fprintf('Test Accuracy: %f %% \n',test_accuracy);
 
 disp('Done!');
 
+%Load the data again for testing
+data = load('semeion.data');
+
 if ( no_of_test_imgs == 1 )
     %display a sample image
     img_num = 20;
