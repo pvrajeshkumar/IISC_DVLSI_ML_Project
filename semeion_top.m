@@ -59,38 +59,33 @@ else
 end    
 fprintf('Test Accuracy: %f %% \n',test_accuracy);
 
-disp('Done!');
+fprintf('\n\n ***** Testing Sample Images.... \n');
 
-%Load the data again for testing
+
+%display test sample images (This can go for Verilog TestBench)
+% 'semeion.data' unshuffled test data are arranged at 20 in a group
+test_imgs= [1, 21, 41, 61, 81, 101, 121, 141, 161, 181];
+figure
+tiledlayout(1,no_of_test_imgs)
+
+%Load the unshuffled data again for testing the images in "test_imgs" above
 data = load('semeion.data');
 
-if ( no_of_test_imgs == 1 )
-    %display a sample image
-    img_num = 20;
+%test the images in "test_imgs" above
+for test_imgs_index = 1:no_of_test_imgs
+    nexttile
+    
+    %Get Predicted img from the test_imgs[] 
+    [accuracy, prediction] = inference_fixp_test_image(data,test_imgs(test_imgs_index),w12,w23,b12,b23);
+    fprintf('Accuracy: %f %% \n',accuracy);
+    fprintf('Prediction: %d \n',prediction);
+
+    img_num = test_imgs(test_imgs_index);
     sample_img_vector = data(img_num,1:256);
     sample_img = reshape(sample_img_vector,[16,16]);
     imshow(sample_img.')
-else
-    %display test sample images (This can go for Verilog TestBench)
-    test_imgs= [1, 21, 41, 61, 81, 101, 121, 141, 161, 181];
-    figure
-    tiledlayout(1,no_of_test_imgs)
-    
-    %test the images above
-    for test_imgs_index = 1:no_of_test_imgs
-        nexttile
-        
-        %Get Predicted img from the test_imgs[] 
-        if (use_fixp_inference)
-            test_accuracy = inference_fixp(test_data,test_imgs(test_imgs_index),w12,w23,b12,b23);
-        else
-            test_accuracy = inference(test_data,test_imgs(test_imgs_index),w12,w23,b12,b23);
-        end   
-
-        img_num = test_imgs(test_imgs_index);
-        sample_img_vector = data(img_num,1:256);
-        sample_img = reshape(sample_img_vector,[16,16]);
-        imshow(sample_img.')
-    end
 end
+
+
+fprintf('\n\nDone!\n');
 

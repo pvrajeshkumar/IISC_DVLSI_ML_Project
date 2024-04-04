@@ -1,4 +1,4 @@
-function accuracy = inference_fixp(data,testd,w12,w23,b12,b23)
+function [accuracy, prediction] = inference_fixp_test_image(data,testd,w12,w23,b12,b23)
 %Inference on test data
 
 %Test Data
@@ -72,5 +72,6 @@ for i = 1:testd
 end
 
 accuracy = success/testd*100;
+prediction = num;
 
 end
