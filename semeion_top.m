@@ -1,6 +1,11 @@
 %Top Script to Train and Classify Handwritten Digits
 clear all;
+%Globals for accessing in different script files
 global slope;
+global w12;
+global w23;
+global b12;
+global b23;
 
 %Configuration Parameters
 eta = 0.02; %learning rate
@@ -12,6 +17,7 @@ slope = 0.05; %relu slope
 do_training = 0;  %Set 1 for Training. Set 0 if only inference
 use_fixp_inference = 1; %Set 1 for fixedpoint. Set 0 without fixed point inference
 no_of_test_imgs = 10;  %To test Single or multiple images
+gen_mem_files = 1;
 load_randomized_data = 1;
 
 disp('Starting ...');
@@ -40,7 +46,9 @@ if (do_training)  %do training??
 [w12,w23,b12,b23] = training(train_data,traind,hidden_nodes, eta, epochs, mini_batch_size);
 save('trained_params.mat','w12','w23','b12','b23');
 end
+
 %Load the saved training parameters
+%Note: If Training is not done, it is expected to have this file locally
 load('trained_params.mat','w12','w23','b12','b23');
 
 %Check train data accuracy
@@ -59,14 +67,18 @@ else
 end    
 fprintf('Test Accuracy: %f %% \n',test_accuracy);
 
-fprintf('\n\n ***** Testing Sample Images.... \n');
 
+if ( gen_mem_files )
+    fprintf('\n\n ***** Generate Weights & Biases BIN files ***** \n');
+    verilog_mem_file_gen();
+end
 
 %display test sample images (This can go for Verilog TestBench)
 % 'semeion.data' unshuffled test data are arranged at 20 in a group
 test_imgs= [1, 21, 41, 61, 81, 101, 121, 141, 161, 181];
 figure
-tiledlayout(1,no_of_test_imgs)
+%tiledlayout(1,no_of_test_imgs)
+tiledlayout("flow")
 
 %Load the unshuffled data again for testing the images in "test_imgs" above
 data = load('semeion.data');
@@ -84,6 +96,8 @@ for test_imgs_index = 1:no_of_test_imgs
     sample_img_vector = data(img_num,1:256);
     sample_img = reshape(sample_img_vector,[16,16]);
     imshow(sample_img.')
+    label_desc = sprintf("Predicted: %d", prediction);
+    xlabel(label_desc);
 end
 
 
