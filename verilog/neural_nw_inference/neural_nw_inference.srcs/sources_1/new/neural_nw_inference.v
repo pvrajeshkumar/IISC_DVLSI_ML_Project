@@ -51,7 +51,7 @@ parameter W23_MUL       =   4'b0100;
 parameter B23_ADD       =   4'b0101;
 parameter RELU_STAGE2   =   4'b0110;
 parameter PREDICTION    =   4'b0111;
-parameter DONE          =   4'b1000;
+parameter FINISHED      =   4'b1000;
 
 reg [3:0] state;
 
@@ -65,8 +65,8 @@ always @(posedge clk, posedge rst) begin
         case (state)
                 
             IDLE: begin
+                done = 0; //Set the done to ZERO upon begining
                 if (start) begin
-                    done = 0; //Set the done to ZERO upon begining
                     state = W12_MUL;
                 end
             end
@@ -96,10 +96,10 @@ always @(posedge clk, posedge rst) begin
             end
         
             PREDICTION: begin
-            state = DONE;
+            state = FINISHED;
             end
         
-            DONE: begin
+            FINISHED: begin
             done = 1;
             state = IDLE;
             prediction = 4'b111;

@@ -28,6 +28,7 @@ reg [0:255] test_imgs[0:9];
 wire done;
 wire [0:3] prediction;
 
+integer i;
 
 neural_nw_inference tb( .clk(clk), .rst(rst), .start(start), .test_img(img), .done(done), .prediction(prediction) );
 
@@ -47,24 +48,35 @@ test_imgs[9] <= 256'b00000111111100000000111000010000001110000001000000100000000
 
 clk = 0;
 rst = 1;
+start = 0;
 #5;
 rst = 0;
 
-img = test_imgs[1];
-start = 0;
-#5;
-start = 1;
-
-$display("done: %d, prediction: %d", done, prediction);
-
-// Wait for done signal
-//@(posedge clk);
-while (!done) begin
-    @(posedge clk);
+for (i=0; i<10; i=i+1) begin
+    img = test_imgs[i];
+    start = 0;
+    #5;
+    start = 1;
+    
+    $display("done: %d, prediction: %d", done, prediction);
+    
+    // Wait for done signal
+    //@(posedge clk);
+    while (!done) begin
+        @(posedge clk);
+    end
+            
+    if (prediction==i)
+        $display("CORRECT");
+    else
+        $display("WRONG");
+ 
 end
 
 
 // End simulation
+start = 0;
+#5;
 $finish;
 
 end
