@@ -114,6 +114,24 @@ for i=1:loop_cnt
 end
 fclose(fileID);
 
+%Generating TestBench Images Vectors
+fprintf('\t Generating TestBench Images Vectors.... \n');
+% 'semeion.data' unshuffled test data are arranged at 20 in a group
+tb_imgs = [1, 21, 41, 61, 81, 101, 121, 141, 161, 181];
+%Load the unshuffled data again for testing the images in "tb_imgs" above
+tb_data = load('semeion.data');
+fileID = fopen("tb_imgs.v", "w");
+for i=1:length(tb_imgs)
+    bitString = '';
+    dat = tb_data(tb_imgs(i), 1:pixels_in_input_img);
+    % Loop through each element in the array
+    for j = 1:length(dat)
+	    % Convert the number to binary and concatenate
+	    bitString = strcat(bitString, dec2bin(dat(j)));
+    end
+    fprintf(fileID, "test_imgs[%d] <= 256'b%s;\n", i, bitString);
+end
+fclose(fileID);
 
 fprintf(' ***** Generating files DONE. ***** \n');
 
