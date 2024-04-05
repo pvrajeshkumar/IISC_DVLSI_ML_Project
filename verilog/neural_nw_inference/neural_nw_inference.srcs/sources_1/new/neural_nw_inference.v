@@ -44,11 +44,11 @@ parameter OUTP_NODES          =   8'd10;
 
 // States of the operations
 parameter IDLE          =   4'b0000;
-parameter W12_MUL       =   4'b0001;
-parameter B12_ADD       =   4'b0010;
+parameter W12_MULTIPLY  =   4'b0001;
+parameter B12_ADDITION  =   4'b0010;
 parameter RELU_STAGE1   =   4'b0011;
-parameter W23_MUL       =   4'b0100;
-parameter B23_ADD       =   4'b0101;
+parameter W23_MULTIPLY  =   4'b0100;
+parameter B23_ADDITION  =   4'b0101;
 parameter RELU_STAGE2   =   4'b0110;
 parameter PREDICTION    =   4'b0111;
 parameter FINISHED      =   4'b1000;
@@ -67,27 +67,27 @@ always @(posedge clk, posedge rst) begin
             IDLE: begin
                 done = 0; //Set the done to ZERO upon begining
                 if (start) begin
-                    state = W12_MUL;
+                    state = W12_MULTIPLY;
                 end
             end
         
-            W12_MUL: begin
-            state = B12_ADD;
+            W12_MULTIPLY: begin
+            state = B12_ADDITION;
             end
         
-            B12_ADD: begin
+            B12_ADDITION: begin
             state = RELU_STAGE1;
             end
         
             RELU_STAGE1: begin
-            state = W23_MUL;
+            state = W23_MULTIPLY;
             end
         
-            W23_MUL: begin
-            state = B23_ADD;
+            W23_MULTIPLY: begin
+            state = B23_ADDITION;
             end
         
-            B23_ADD: begin
+            B23_ADDITION: begin
             state = RELU_STAGE2;
             end
         
