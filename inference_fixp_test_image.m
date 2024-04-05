@@ -1,8 +1,12 @@
 function [accuracy, prediction] = inference_fixp_test_image(data,testd,w12,w23,b12,b23)
 %Inference on test data
 
+global pixels_in_input_img;
+global totalbits;
+global fractionbits;
+
 %Test Data
-images = data(1:testd,1:256);
+images = data(1:testd,1:pixels_in_input_img);
 images = images';
 
 %Test Labels
@@ -17,10 +21,10 @@ end
 
 success = 0;
 
-    [w12_fix_float, w12_fix_int, err] = fixedpoint(w12, 16,8,1);
-    [w23_fix_float, w23_fix_int, err] = fixedpoint(w23, 16,8,1);
-    [b12_fix_float, b12_fix_int, err] = fixedpoint(b12, 16,8,1);
-    [b23_fix_float, b23_fix_int, err] = fixedpoint(b23, 16,8,1);
+    [w12_fix_float, w12_fix_int, err] = fixedpoint(w12, totalbits,fractionbits,1);
+    [w23_fix_float, w23_fix_int, err] = fixedpoint(w23, totalbits,fractionbits,1);
+    [b12_fix_float, b12_fix_int, err] = fixedpoint(b12, totalbits,fractionbits,1);
+    [b23_fix_float, b23_fix_int, err] = fixedpoint(b23, totalbits,fractionbits,1);
 
 
 %Some points for Fixed point calculations

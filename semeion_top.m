@@ -6,6 +6,15 @@ global w12;
 global w23;
 global b12;
 global b23;
+global hidden_nodes;
+global pixels_in_input_img;
+global output_nodes;
+global totalbits;
+global fractionbits;
+
+%Input & Output widths. For Verilog file generation
+pixels_in_input_img = 256;
+output_nodes = 10;
 
 %Configuration Parameters
 eta = 0.02; %learning rate
@@ -19,6 +28,10 @@ use_fixp_inference = 1; %Set 1 for fixedpoint. Set 0 without fixed point inferen
 no_of_test_imgs = 10;  %To test Single or multiple images
 gen_mem_files = 1;
 load_randomized_data = 1;
+%Fixed point configuration
+totalbits = 16;
+fractionbits = 8;
+
 
 disp('Starting ...');
 
@@ -74,6 +87,7 @@ if ( gen_mem_files )
 end
 
 %display test sample images (This can go for Verilog TestBench)
+fprintf('\n\n ***** Test & display test sample images ***** \n');
 % 'semeion.data' unshuffled test data are arranged at 20 in a group
 test_imgs= [1, 21, 41, 61, 81, 101, 121, 141, 161, 181];
 figure
@@ -86,11 +100,16 @@ data = load('semeion.data');
 %test the images in "test_imgs" above
 for test_imgs_index = 1:no_of_test_imgs
     nexttile
-    
+
+    %Retrieve actual value from the test data to compare with prediction
+    test_labels = data(test_imgs(test_imgs_index),257:266);
+    [maxv1,index] = max(test_labels);
+    actual_val = index-1; %subtract the index by 1 as matlab indices are 1-10
+
     %Get Predicted img from the test_imgs[] 
     [accuracy, prediction] = inference_fixp_test_image(data,test_imgs(test_imgs_index),w12,w23,b12,b23);
-    fprintf('Accuracy: %f %% \n',accuracy);
-    fprintf('Prediction: %d \n',prediction);
+
+    fprintf('Actual: %d, Prediction: %d \n',actual_val, prediction);
 
     img_num = test_imgs(test_imgs_index);
     sample_img_vector = data(img_num,1:256);
