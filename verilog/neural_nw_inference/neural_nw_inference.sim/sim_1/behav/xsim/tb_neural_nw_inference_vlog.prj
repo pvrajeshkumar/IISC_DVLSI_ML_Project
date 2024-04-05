@@ -1,0 +1,10 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../neural_nw_inference.srcs/sources_1/new/neural_nw_inference.v" \
+"../../../../neural_nw_inference.srcs/sim_1/new/tb_neural_nw_inference.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

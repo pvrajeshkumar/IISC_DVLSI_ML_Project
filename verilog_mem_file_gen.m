@@ -129,7 +129,7 @@ for i=1:length(tb_imgs)
 	    % Convert the number to binary and concatenate
 	    bitString = strcat(bitString, dec2bin(dat(j)));
     end
-    fprintf(fileID, "test_imgs[%d] <= 256'b%s;\n", i, bitString);
+    fprintf(fileID, "test_imgs[%d] <= 256'b%s;\n", i-1, bitString);
 end
 fclose(fileID);
 

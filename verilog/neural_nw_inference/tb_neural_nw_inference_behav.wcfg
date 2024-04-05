@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_neural_nw_inference_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_neural_nw_inference" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="4,657 ps"></ZoomStartTime>
+      <ZoomEndTime time="6,913 ps"></ZoomEndTime>
+      <Cursor1Time time="5,043 ps"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="189"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="7" />
+   <wvobject fp_name="/tb_neural_nw_inference/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/img" type="array">
+      <obj_property name="ElementShortName">img[0:255]</obj_property>
+      <obj_property name="ObjectShortName">img[0:255]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/test_imgs" type="array">
+      <obj_property name="ElementShortName">test_imgs[0:9][0:255]</obj_property>
+      <obj_property name="ObjectShortName">test_imgs[0:9][0:255]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/prediction" type="array">
+      <obj_property name="ElementShortName">prediction[0:3]</obj_property>
+      <obj_property name="ObjectShortName">prediction[0:3]</obj_property>
+   </wvobject>
+</wave_config>
