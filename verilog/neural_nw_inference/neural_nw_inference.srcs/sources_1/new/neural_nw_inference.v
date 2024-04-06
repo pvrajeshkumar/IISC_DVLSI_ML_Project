@@ -41,6 +41,10 @@ parameter OUTP_NODES          =   8'd10;
 //z3 = w23 x a2 ====== [10 x 40]  * [40 x 1]   ===== [10 x 1]
 //So, RELU(z3) is a3  ===== [10 x 1]
 
+wire signed [0:15] w12 [0:39][0:255];
+wire signed [0:15] b12 [0:39];
+wire signed [0:15] w23 [0:9][0:39];
+wire signed [0:15] b23 [0:9];
 
 // States of the operations
 parameter IDLE          =   4'b0000;
