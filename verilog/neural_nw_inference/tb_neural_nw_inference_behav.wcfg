@@ -16,7 +16,7 @@
       <Cursor1Time time="350.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="181"></NameColumnWidth>
+      <NameColumnWidth column_width="177"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="9" />
@@ -56,5 +56,6 @@
    <wvobject fp_name="/tb_neural_nw_inference/prediction" type="array">
       <obj_property name="ElementShortName">prediction[0:3]</obj_property>
       <obj_property name="ObjectShortName">prediction[0:3]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
 </wave_config>

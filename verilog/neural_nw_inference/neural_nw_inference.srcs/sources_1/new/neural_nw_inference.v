@@ -56,6 +56,7 @@ wire signed [0:31] b23_shifted[0:9];                         //[MATLAB]: b23_fix
 reg signed [0:43] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
 reg signed [0:60] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q44.24 * Q17.8 = Q61.32
 
+
 // States of the operations
 parameter IDLE          =   4'b0000;
 parameter W12_MULTIPLY  =   4'b0001;
@@ -77,52 +78,80 @@ always @(posedge clk, posedge rst) begin
     end
     else begin
         case (state)
-                
-            IDLE: begin
-                done = 0; //Set the done to ZERO upon begining
-                if (start) begin
-                    state = W12_MULTIPLY;
-                end
-            end
-        
-            W12_MULTIPLY: begin
-            state = B12_ADDITION;
-            end
-        
-            B12_ADDITION: begin
-            state = RELU_STAGE1;
-            end
-        
-            RELU_STAGE1: begin
-            state = W23_MULTIPLY;
-            end
-        
-            W23_MULTIPLY: begin
-            state = B23_ADDITION;
-            end
-        
-            B23_ADDITION: begin
-            state = RELU_STAGE2;
-            end
-        
-            RELU_STAGE2: begin
-            state = PREDICTION;
-            end
-        
-            PREDICTION: begin
-            state = FINISHED;
-            end
-        
-            FINISHED: begin
-            done = 1;
-            state = IDLE;
-            prediction = 4'b111;
-            end
-                
+            IDLE: idle_state();
+            W12_MULTIPLY: weights_multiply_w12();
+            B12_ADDITION: bias_add_b12();
+            RELU_STAGE1: relu_stage1();
+            W23_MULTIPLY: weights_multiply_w23();
+            B23_ADDITION: bias_add_b23();
+            RELU_STAGE2: relu_stage2();
+            PREDICTION: predict_img_value();
+            FINISHED: finished();
         endcase
     end
-
 end
+
+// Task definitions
+task idle_state;
+begin
+    done = 0; //Set the done to ZERO upon beginning
+    if (start) begin
+        state = W12_MULTIPLY;
+    end
+end
+endtask
+
+task weights_multiply_w12;
+begin
+    state = B12_ADDITION; //Multiplication done. Now, go to next state
+end
+endtask
+
+task bias_add_b12;
+begin
+    state = RELU_STAGE1;
+end
+endtask
+
+task relu_stage1;
+begin
+    state = W23_MULTIPLY;
+end
+endtask
+
+task weights_multiply_w23;
+begin
+    state = B23_ADDITION;
+end
+endtask
+
+task bias_add_b23;
+begin
+    state = RELU_STAGE2;
+end
+endtask
+
+task relu_stage2;
+begin
+    state = PREDICTION;
+end
+endtask
+
+task predict_img_value;
+begin
+    state = FINISHED;
+end
+endtask
+
+task finished;
+begin
+    done = 1;
+    state = IDLE;
+    prediction = 4'b1111; // Adjusted to match the number of bits in the declaration
+end
+endtask
+
+
 
 //    *******************************  END OF Code flow  *******************************    
 
