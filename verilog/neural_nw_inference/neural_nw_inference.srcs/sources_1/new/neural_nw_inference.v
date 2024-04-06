@@ -20,13 +20,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module neural_nw_inference( clk, rst, start, test_img, done, prediction );
+module neural_nw_inference( clk, rst, start, test_img, done, predicted_val );
 input clk;
 input rst;
 input start;
 input [0:255] test_img;
 output reg done;
-output reg [0:3] prediction;
+output reg [0:3] predicted_val;
 
 //Configuration parameters based on the trained data
 parameter INP_IMG_PIXELS      =   9'd256;
@@ -326,7 +326,7 @@ begin
         state = FINISHED; //RELU done. Now, go to FINISHED state
         count = 0;
     end   
-    prediction = max_index;
+    predicted_val = max_index;
 end
 endtask
 

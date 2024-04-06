@@ -26,11 +26,11 @@ reg clk, rst, start;
 reg [0:255] img;
 reg [0:255] test_imgs[0:9];
 wire done;
-wire [0:3] prediction;
+wire [0:3] predicted_val;
 
 integer i;
 
-neural_nw_inference tb( .clk(clk), .rst(rst), .start(start), .test_img(img), .done(done), .prediction(prediction) );
+neural_nw_inference tb( .clk(clk), .rst(rst), .start(start), .test_img(img), .done(done), .predicted_val(predicted_val) );
 
 always #1 clk = ~clk;
 
@@ -58,7 +58,7 @@ for (i=0; i<10; i=i+1) begin
     #5;
     start = 1;
     
-    $display("Image No: %d, done: %d, prediction: %d", i, done, prediction);
+    $display("Image No: %d, done: %d, predicted_val: %d", i, done, predicted_val);
     
     // Wait for done signal
     //@(posedge clk);
@@ -66,7 +66,7 @@ for (i=0; i<10; i=i+1) begin
         @(posedge clk);
     end
             
-    if (prediction==i)
+    if (predicted_val==i)
         $display("CORRECT");
     else
         $display("WRONG");
