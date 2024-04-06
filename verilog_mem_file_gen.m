@@ -37,9 +37,9 @@ fileID = fopen("b12.v", "w");
 loop_cnt = hidden_nodes;
 for i=1:loop_cnt
     if( b12_fix_int(i) < 0 )
-        fprintf(fileID, "assign b12[%d] = -%d'd%d;\n", mod(i-1, hidden_nodes), totalbits, abs(b12_fix_int(i)));
+        fprintf(fileID, "assign b12[%d] = -%d'd%d;\n", i-1, totalbits, abs(b12_fix_int(i)));
     else
-        fprintf(fileID, "assign b12[%d] = %d'd%d;\n", mod(i-1, hidden_nodes), totalbits, b12_fix_int(i));
+        fprintf(fileID, "assign b12[%d] = %d'd%d;\n", i-1, totalbits, b12_fix_int(i));
     end    
 end
 fclose(fileID);
@@ -64,10 +64,10 @@ fprintf('\t Generating b23.v.... \n');
 fileID = fopen("b23.v", "w");
 loop_cnt = output_nodes;
 for i=1:loop_cnt
-    if( b12_fix_int(i) < 0 )
-        fprintf(fileID, "assign b23[%d] = -%d'd%d;\n", mod(i-1, output_nodes), totalbits, abs(b23_fix_int(i)));
+    if( b23_fix_int(i) < 0 )
+        fprintf(fileID, "assign b23[%d] = -%d'd%d;\n", i-1, totalbits, abs(b23_fix_int(i)));
     else
-        fprintf(fileID, "assign b23[%d] = %d'd%d;\n", mod(i-1, output_nodes), totalbits, b23_fix_int(i));
+        fprintf(fileID, "assign b23[%d] = %d'd%d;\n", i-1, totalbits, b23_fix_int(i));
     end    
 end
 fclose(fileID);
