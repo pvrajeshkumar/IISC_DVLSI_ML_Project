@@ -62,7 +62,7 @@ for i = 1:testd
     b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
     z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
     %Apply RELU with Fixed point representation
-    a3 = leaky_relu_fixp(z3);
+    a3 = leaky_relu_fixp(z3);  % Q44.24 * Q17.8 = Q61.32
 
     %Get the index of the maximum output
     [maxv1,index1] = max(a3);

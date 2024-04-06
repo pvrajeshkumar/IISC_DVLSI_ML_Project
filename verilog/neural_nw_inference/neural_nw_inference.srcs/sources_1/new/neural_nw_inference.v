@@ -46,6 +46,16 @@ wire signed [0:15] b12 [0:39];
 wire signed [0:15] w23 [0:9][0:39];
 wire signed [0:15] b23 [0:9];
 
+//Intermediate compute variables
+reg signed [0:16] w12_mul_test_img[0:39];                   //[MATLAB]: z2_interim = w12_fix_int * a1; % (Q16.8 * Q1.0 = Q17.8).
+reg signed [0:16] z2[0:39];     //w12_mul_test_img+b12      //[MATLAB]: z2 = z2_interim + b12_fix_int; % Q17.8 + Q16.8 = Q17.8
+reg signed [0:27] a2[0:39];                                 //[MATLAB]: a2 = leaky_relu_fixp(z2);  % Q11.8 * Q17.8 = Q28.16
+
+reg signed [0:43] w23_mul_a2[0:9];                          //[MATLAB]: z3_interim = w23_fix_int * a2; % (Q16.8 * Q28.16 = Q44.24).
+wire signed [0:31] b23_shifted[0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
+reg signed [0:43] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
+reg signed [0:60] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q44.24 * Q17.8 = Q61.32
+
 // States of the operations
 parameter IDLE          =   4'b0000;
 parameter W12_MULTIPLY  =   4'b0001;
@@ -10813,6 +10823,17 @@ assign b23[7] = 16'd204;
 assign b23[8] = -16'd204;
 assign b23[9] = -16'd69;
 
+
+assign b23_shifted[0] = {b23[0], 16'b0};
+assign b23_shifted[1] = {b23[1], 16'b0};
+assign b23_shifted[2] = {b23[2], 16'b0};
+assign b23_shifted[3] = {b23[3], 16'b0};
+assign b23_shifted[4] = {b23[4], 16'b0};
+assign b23_shifted[5] = {b23[5], 16'b0};
+assign b23_shifted[6] = {b23[6], 16'b0};
+assign b23_shifted[7] = {b23[7], 16'b0};
+assign b23_shifted[8] = {b23[8], 16'b0};
+assign b23_shifted[9] = {b23[9], 16'b0};
 
 
 endmodule
