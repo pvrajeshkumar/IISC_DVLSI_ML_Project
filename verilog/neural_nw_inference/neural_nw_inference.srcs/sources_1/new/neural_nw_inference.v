@@ -47,15 +47,18 @@ wire signed [0:15] w23 [0:9][0:39];
 wire signed [0:15] b23 [0:9];
 
 //Intermediate compute variables
+//Input side
 reg signed [0:16] w12_mul_test_img[0:39];                   //[MATLAB]: z2_interim = w12_fix_int * a1; % (Q16.8 * Q1.0 = Q17.8).
 reg signed [0:16] z2[0:39];     //w12_mul_test_img+b12      //[MATLAB]: z2 = z2_interim + b12_fix_int; % Q17.8 + Q16.8 = Q17.8
 reg signed [0:27] a2[0:39];                                 //[MATLAB]: a2 = leaky_relu_fixp(z2);  % Q11.8 * Q17.8 = Q28.16
 
+//Output side
 reg signed [0:43] w23_mul_a2[0:9];                          //[MATLAB]: z3_interim = w23_fix_int * a2; % (Q16.8 * Q28.16 = Q44.24).
 wire signed [0:31] b23_shifted[0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
 reg signed [0:43] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
 reg signed [0:60] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q44.24 * Q17.8 = Q61.32
 
+integer count;  //For loop counts
 
 // States of the operations
 parameter IDLE          =   4'b0000;
@@ -97,25 +100,149 @@ begin
     done = 0; //Set the done to ZERO upon beginning
     if (start) begin
         state = W12_MULTIPLY;
+        count = 0;   
+
+        //Initialize all variables being used
+        //Input side initialization               
+        w12_mul_test_img[0]  <= 0;  z2[0]  <= 0;  a2[0]  <= 0;
+        w12_mul_test_img[1]  <= 0;  z2[1]  <= 0;  a2[1]  <= 0;
+        w12_mul_test_img[2]  <= 0;  z2[2]  <= 0;  a2[2]  <= 0;
+        w12_mul_test_img[3]  <= 0;  z2[3]  <= 0;  a2[3]  <= 0;
+        w12_mul_test_img[4]  <= 0;  z2[4]  <= 0;  a2[4]  <= 0;
+        w12_mul_test_img[5]  <= 0;  z2[5]  <= 0;  a2[5]  <= 0;
+        w12_mul_test_img[6]  <= 0;  z2[6]  <= 0;  a2[6]  <= 0;
+        w12_mul_test_img[7]  <= 0;  z2[7]  <= 0;  a2[7]  <= 0;
+        w12_mul_test_img[8]  <= 0;  z2[8]  <= 0;  a2[8]  <= 0;
+        w12_mul_test_img[9]  <= 0;  z2[9]  <= 0;  a2[9]  <= 0;
+        w12_mul_test_img[10] <= 0;  z2[10] <= 0;  a2[10] <= 0;
+        w12_mul_test_img[11] <= 0;  z2[11] <= 0;  a2[11] <= 0;
+        w12_mul_test_img[12] <= 0;  z2[12] <= 0;  a2[12] <= 0;
+        w12_mul_test_img[13] <= 0;  z2[13] <= 0;  a2[13] <= 0;
+        w12_mul_test_img[14] <= 0;  z2[14] <= 0;  a2[14] <= 0;
+        w12_mul_test_img[15] <= 0;  z2[15] <= 0;  a2[15] <= 0;
+        w12_mul_test_img[16] <= 0;  z2[16] <= 0;  a2[16] <= 0;
+        w12_mul_test_img[17] <= 0;  z2[17] <= 0;  a2[17] <= 0;
+        w12_mul_test_img[18] <= 0;  z2[18] <= 0;  a2[18] <= 0;
+        w12_mul_test_img[19] <= 0;  z2[19] <= 0;  a2[19] <= 0;
+        w12_mul_test_img[20] <= 0;  z2[20] <= 0;  a2[20] <= 0;
+        w12_mul_test_img[21] <= 0;  z2[21] <= 0;  a2[21] <= 0;
+        w12_mul_test_img[22] <= 0;  z2[22] <= 0;  a2[22] <= 0;
+        w12_mul_test_img[23] <= 0;  z2[23] <= 0;  a2[23] <= 0;
+        w12_mul_test_img[24] <= 0;  z2[24] <= 0;  a2[24] <= 0;
+        w12_mul_test_img[25] <= 0;  z2[25] <= 0;  a2[25] <= 0;
+        w12_mul_test_img[26] <= 0;  z2[26] <= 0;  a2[26] <= 0;
+        w12_mul_test_img[27] <= 0;  z2[27] <= 0;  a2[27] <= 0;
+        w12_mul_test_img[28] <= 0;  z2[28] <= 0;  a2[28] <= 0;
+        w12_mul_test_img[29] <= 0;  z2[29] <= 0;  a2[29] <= 0;
+        w12_mul_test_img[30] <= 0;  z2[30] <= 0;  a2[30] <= 0;
+        w12_mul_test_img[31] <= 0;  z2[31] <= 0;  a2[31] <= 0;
+        w12_mul_test_img[32] <= 0;  z2[32] <= 0;  a2[32] <= 0;
+        w12_mul_test_img[33] <= 0;  z2[33] <= 0;  a2[33] <= 0;
+        w12_mul_test_img[34] <= 0;  z2[34] <= 0;  a2[34] <= 0;
+        w12_mul_test_img[35] <= 0;  z2[35] <= 0;  a2[35] <= 0;
+        w12_mul_test_img[36] <= 0;  z2[36] <= 0;  a2[36] <= 0;
+        w12_mul_test_img[37] <= 0;  z2[37] <= 0;  a2[37] <= 0;
+        w12_mul_test_img[38] <= 0;  z2[38] <= 0;  a2[38] <= 0;
+        w12_mul_test_img[39] <= 0;  z2[39] <= 0;  a2[39] <= 0;
+		
+		//Output side initialization
+        w23_mul_a2[0]  <= 0;  z3[0]  <= 0;  a3[0]  <= 0;
+        w23_mul_a2[1]  <= 0;  z3[1]  <= 0;  a3[1]  <= 0;
+        w23_mul_a2[2]  <= 0;  z3[2]  <= 0;  a3[2]  <= 0;
+        w23_mul_a2[3]  <= 0;  z3[3]  <= 0;  a3[3]  <= 0;
+        w23_mul_a2[4]  <= 0;  z3[4]  <= 0;  a3[4]  <= 0;
+        w23_mul_a2[5]  <= 0;  z3[5]  <= 0;  a3[5]  <= 0;
+        w23_mul_a2[6]  <= 0;  z3[6]  <= 0;  a3[6]  <= 0;
+        w23_mul_a2[7]  <= 0;  z3[7]  <= 0;  a3[7]  <= 0;
+        w23_mul_a2[8]  <= 0;  z3[8]  <= 0;  a3[8]  <= 0;
+        w23_mul_a2[9]  <= 0;  z3[9]  <= 0;  a3[9]  <= 0;   
+        
     end
 end
 endtask
 
 task weights_multiply_w12;
 begin
-    state = B12_ADDITION; //Multiplication done. Now, go to next state
+
+    w12_mul_test_img[0]  <= w12_mul_test_img[0] + w12[0][count]*test_img[count];
+    w12_mul_test_img[1]  <= w12_mul_test_img[1] + w12[1][count]*test_img[count];
+    w12_mul_test_img[2]  <= w12_mul_test_img[2] + w12[2][count]*test_img[count];
+    w12_mul_test_img[3]  <= w12_mul_test_img[3] + w12[3][count]*test_img[count];
+    w12_mul_test_img[4]  <= w12_mul_test_img[4] + w12[4][count]*test_img[count];
+    w12_mul_test_img[5]  <= w12_mul_test_img[5] + w12[5][count]*test_img[count];
+    w12_mul_test_img[6]  <= w12_mul_test_img[6] + w12[6][count]*test_img[count];
+    w12_mul_test_img[7]  <= w12_mul_test_img[7] + w12[7][count]*test_img[count];
+    w12_mul_test_img[8]  <= w12_mul_test_img[8] + w12[8][count]*test_img[count];
+    w12_mul_test_img[9]  <= w12_mul_test_img[9] + w12[9][count]*test_img[count];
+    w12_mul_test_img[10] <= w12_mul_test_img[10] + w12[10][count]*test_img[count];
+    w12_mul_test_img[11] <= w12_mul_test_img[11] + w12[11][count]*test_img[count];
+    w12_mul_test_img[12] <= w12_mul_test_img[12] + w12[12][count]*test_img[count];
+    w12_mul_test_img[13] <= w12_mul_test_img[13] + w12[13][count]*test_img[count];
+    w12_mul_test_img[14] <= w12_mul_test_img[14] + w12[14][count]*test_img[count];
+    w12_mul_test_img[15] <= w12_mul_test_img[15] + w12[15][count]*test_img[count];
+    w12_mul_test_img[16] <= w12_mul_test_img[16] + w12[16][count]*test_img[count];
+    w12_mul_test_img[17] <= w12_mul_test_img[17] + w12[17][count]*test_img[count];
+    w12_mul_test_img[18] <= w12_mul_test_img[18] + w12[18][count]*test_img[count];
+    w12_mul_test_img[19] <= w12_mul_test_img[19] + w12[19][count]*test_img[count];
+    w12_mul_test_img[20] <= w12_mul_test_img[20] + w12[20][count]*test_img[count];
+    w12_mul_test_img[21] <= w12_mul_test_img[21] + w12[21][count]*test_img[count];
+    w12_mul_test_img[22] <= w12_mul_test_img[22] + w12[22][count]*test_img[count];
+    w12_mul_test_img[23] <= w12_mul_test_img[23] + w12[23][count]*test_img[count];
+    w12_mul_test_img[24] <= w12_mul_test_img[24] + w12[24][count]*test_img[count];
+    w12_mul_test_img[25] <= w12_mul_test_img[25] + w12[25][count]*test_img[count];
+    w12_mul_test_img[26] <= w12_mul_test_img[26] + w12[26][count]*test_img[count];
+    w12_mul_test_img[27] <= w12_mul_test_img[27] + w12[27][count]*test_img[count];
+    w12_mul_test_img[28] <= w12_mul_test_img[28] + w12[28][count]*test_img[count];
+    w12_mul_test_img[29] <= w12_mul_test_img[29] + w12[29][count]*test_img[count];
+    w12_mul_test_img[30] <= w12_mul_test_img[30] + w12[30][count]*test_img[count];
+    w12_mul_test_img[31] <= w12_mul_test_img[31] + w12[31][count]*test_img[count];
+    w12_mul_test_img[32] <= w12_mul_test_img[32] + w12[32][count]*test_img[count];
+    w12_mul_test_img[33] <= w12_mul_test_img[33] + w12[33][count]*test_img[count];
+    w12_mul_test_img[34] <= w12_mul_test_img[34] + w12[34][count]*test_img[count];
+    w12_mul_test_img[35] <= w12_mul_test_img[35] + w12[35][count]*test_img[count];
+    w12_mul_test_img[36] <= w12_mul_test_img[36] + w12[36][count]*test_img[count];
+    w12_mul_test_img[37] <= w12_mul_test_img[37] + w12[37][count]*test_img[count];
+    w12_mul_test_img[38] <= w12_mul_test_img[38] + w12[38][count]*test_img[count];
+    w12_mul_test_img[39] <= w12_mul_test_img[39] + w12[39][count]*test_img[count];
+    
+    count = count+1;
+    
+    if ( count == 255 ) begin
+        state = B12_ADDITION; //W12 Multiplication done. Now, go to B12_ADDITION
+        count = 0;
+    end
+
 end
 endtask
 
 task bias_add_b12;
 begin
-    state = RELU_STAGE1;
+    //Add Biases from B12
+    z2[count] = w12_mul_test_img[count] + b12[count];
+
+    count = count+1;
+    if ( count == 40 ) begin
+        state = RELU_STAGE1; //B12 addition done. Now, go to RELU state
+        count = 0;
+    end    
 end
 endtask
 
 task relu_stage1;
 begin
-    state = W23_MULTIPLY;
+
+    if (z2[count]>0) begin
+        a2[count] = z2[count] * $signed(14'd4096); 
+    end
+    else begin
+        a2[count] = z2[count] * $signed(14'd409);
+    end
+
+    count = count+1;
+    if ( count == 40 ) begin
+        state = W23_MULTIPLY; //Multiplication done. Now, go to next state
+        count = 0;
+    end    
 end
 endtask
 
