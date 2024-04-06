@@ -29,7 +29,7 @@ output reg done;
 output reg [0:3] prediction;
 
 //Configuration parameters based on the trained data
-parameter INP_IMG_PIXELS      =   8'd256;
+parameter INP_IMG_PIXELS      =   9'd256;
 parameter HIDDEN_NODES        =   8'd40;
 parameter OUTP_NODES          =   8'd10;
 
@@ -58,7 +58,14 @@ wire signed [0:31] b23_shifted[0:9];                         //[MATLAB]: b23_fix
 reg signed [0:43] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
 reg signed [0:60] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q44.24 * Q17.8 = Q61.32
 
+//RELU Parameters from MATLAB test output
+parameter relu_multiply_1 = 16'd256;
+parameter relu_multiply_slope = 16'd12;
+
 integer count;  //For loop counts
+reg signed [0:60] max_a3;
+reg signed [0:3] max_index;
+
 
 // States of the operations
 parameter IDLE          =   4'b0000;
@@ -157,6 +164,9 @@ begin
         w23_mul_a2[8]  <= 0;  z3[8]  <= 0;  a3[8]  <= 0;
         w23_mul_a2[9]  <= 0;  z3[9]  <= 0;  a3[9]  <= 0;   
         
+        max_a3 <= 0;
+        max_index <= 0;
+        
     end
 end
 endtask
@@ -232,10 +242,10 @@ task relu_stage1;
 begin
     //LEAKY RELU
     if (z2[count]>0) begin
-        a2[count] = z2[count] * $signed(16'd256); 
+        a2[count] = z2[count] * $signed(relu_multiply_1);   //Multiply by 1
     end
     else begin
-        a2[count] = z2[count] * $signed(16'd12);
+        a2[count] = z2[count] * $signed(relu_multiply_slope);  //Multiply with Slope
     end
 
     count = count+1;
@@ -289,10 +299,10 @@ task relu_stage2;
 begin
     //LEAKY RELU
     if (z3[count]>0) begin
-        a3[count] = z3[count] * $signed(16'd256); 
+        a3[count] = z3[count] * $signed(relu_multiply_1);  //Multiply by 1
     end
     else begin
-        a3[count] = z3[count] * $signed(16'd12);
+        a3[count] = z3[count] * $signed(relu_multiply_slope);  //Multiply with Slope
     end
 
     count = count+1;
@@ -306,9 +316,17 @@ endtask
 task predict_img_value;
 begin
    //Find the MAX 
+    if (a3[count] >= max_a3) begin
+        max_a3 <= a3[count];
+        max_index <= count;
+    end
    
-    state = FINISHED;
-    prediction = 4'b1111; // Adjusted to match the number of bits in the declaration
+    count = count+1;
+    if ( count == 10 ) begin
+        state = FINISHED; //RELU done. Now, go to FINISHED state
+        count = 0;
+    end   
+    prediction = max_index;
 end
 endtask
 

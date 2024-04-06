@@ -58,7 +58,7 @@ for (i=0; i<10; i=i+1) begin
     #5;
     start = 1;
     
-    $display("done: %d, prediction: %d", done, prediction);
+    $display("Image No: %d, done: %d, prediction: %d", i, done, prediction);
     
     // Wait for done signal
     //@(posedge clk);
