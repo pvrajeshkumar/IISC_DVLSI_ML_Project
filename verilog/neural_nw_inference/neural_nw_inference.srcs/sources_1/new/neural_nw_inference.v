@@ -145,7 +145,7 @@ begin
         w12_mul_test_img[38] <= 0;  z2[38] <= 0;  a2[38] <= 0;
         w12_mul_test_img[39] <= 0;  z2[39] <= 0;  a2[39] <= 0;
 		
-		//Output side initialization
+	//Output side initialization
         w23_mul_a2[0]  <= 0;  z3[0]  <= 0;  a3[0]  <= 0;
         w23_mul_a2[1]  <= 0;  z3[1]  <= 0;  a3[1]  <= 0;
         w23_mul_a2[2]  <= 0;  z3[2]  <= 0;  a3[2]  <= 0;
@@ -163,7 +163,7 @@ endtask
 
 task weights_multiply_w12;
 begin
-
+    //Multiply w12  with input test image
     w12_mul_test_img[0]  <= w12_mul_test_img[0] + w12[0][count]*test_img[count];
     w12_mul_test_img[1]  <= w12_mul_test_img[1] + w12[1][count]*test_img[count];
     w12_mul_test_img[2]  <= w12_mul_test_img[2] + w12[2][count]*test_img[count];
@@ -230,17 +230,17 @@ endtask
 
 task relu_stage1;
 begin
-
+    //LEAKY RELU
     if (z2[count]>0) begin
-        a2[count] = z2[count] * $signed(14'd4096); 
+        a2[count] = z2[count] * $signed(16'd256); 
     end
     else begin
-        a2[count] = z2[count] * $signed(14'd409);
+        a2[count] = z2[count] * $signed(16'd12);
     end
 
     count = count+1;
     if ( count == 40 ) begin
-        state = W23_MULTIPLY; //Multiplication done. Now, go to next state
+        state = W23_MULTIPLY; //RELU done. Now, go to prediction state
         count = 0;
     end    
 end
@@ -248,25 +248,67 @@ endtask
 
 task weights_multiply_w23;
 begin
-    state = B23_ADDITION;
+
+    //Multiply w23  B23
+    w23_mul_a2[0]  <= w23_mul_a2[0] + w23[0][count]*a2[count];
+    w23_mul_a2[1]  <= w23_mul_a2[1] + w23[1][count]*a2[count];
+    w23_mul_a2[2]  <= w23_mul_a2[2] + w23[2][count]*a2[count];
+    w23_mul_a2[3]  <= w23_mul_a2[3] + w23[3][count]*a2[count];
+    w23_mul_a2[4]  <= w23_mul_a2[4] + w23[4][count]*a2[count];
+    w23_mul_a2[5]  <= w23_mul_a2[5] + w23[5][count]*a2[count];
+    w23_mul_a2[6]  <= w23_mul_a2[6] + w23[6][count]*a2[count];
+    w23_mul_a2[7]  <= w23_mul_a2[7] + w23[7][count]*a2[count];
+    w23_mul_a2[8]  <= w23_mul_a2[8] + w23[8][count]*a2[count];
+    w23_mul_a2[9]  <= w23_mul_a2[9] + w23[9][count]*a2[count];
+
+    count = count+1;
+    if ( count == 40 ) begin
+        state = B23_ADDITION;
+        count = 0;
+    end    
+
 end
 endtask
 
 task bias_add_b23;
 begin
-    state = RELU_STAGE2;
+
+    //Add Biases from B23
+    z3[count] = w23_mul_a2[count] + b23[count];
+
+    count = count+1;
+    if ( count == 10 ) begin
+        state = RELU_STAGE2; //B23 addition done. Now, go to RELU state
+        count = 0;
+    end    
+
 end
 endtask
 
 task relu_stage2;
 begin
-    state = PREDICTION;
+    //LEAKY RELU
+    if (z3[count]>0) begin
+        a3[count] = z3[count] * $signed(16'd256); 
+    end
+    else begin
+        a3[count] = z3[count] * $signed(16'd12);
+    end
+
+    count = count+1;
+    if ( count == 10 ) begin
+        state = PREDICTION; //RELU done. Now, go to prediction state
+        count = 0;
+    end    
 end
 endtask
 
 task predict_img_value;
 begin
+   //Find the MAX 
+   
     state = FINISHED;
+    prediction = 4'b1111; // Adjusted to match the number of bits in the declaration
 end
 endtask
 
@@ -274,7 +316,7 @@ task finished;
 begin
     done = 1;
     state = IDLE;
-    prediction = 4'b1111; // Adjusted to match the number of bits in the declaration
+    
 end
 endtask
 
