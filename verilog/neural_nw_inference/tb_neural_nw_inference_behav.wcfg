@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1.368333 us"></ZoomStartTime>
-      <ZoomEndTime time="9.578334 us"></ZoomEndTime>
-      <Cursor1Time time="8.210000 us"></Cursor1Time>
+      <ZoomStartTime time="644.275 ns"></ZoomStartTime>
+      <ZoomEndTime time="740.433 ns"></ZoomEndTime>
+      <Cursor1Time time="807.598 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="222"></NameColumnWidth>
-      <ValueColumnWidth column_width="153"></ValueColumnWidth>
+      <ValueColumnWidth column_width="149"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="10" />
    <wvobject fp_name="/tb_neural_nw_inference/clk" type="logic">
@@ -56,7 +56,58 @@
    <wvobject fp_name="/tb_neural_nw_inference/tb/a3" type="array">
       <obj_property name="ElementShortName">a3[0:9][0:60]</obj_property>
       <obj_property name="ObjectShortName">a3[0:9][0:60]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[0]" type="array">
+         <obj_property name="ElementShortName">[0][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[0][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[1]" type="array">
+         <obj_property name="ElementShortName">[1][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[1][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[2]" type="array">
+         <obj_property name="ElementShortName">[2][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[2][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[3]" type="array">
+         <obj_property name="ElementShortName">[3][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[3][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[4]" type="array">
+         <obj_property name="ElementShortName">[4][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[4][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[5]" type="array">
+         <obj_property name="ElementShortName">[5][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[5][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[6]" type="array">
+         <obj_property name="ElementShortName">[6][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[6][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[7]" type="array">
+         <obj_property name="ElementShortName">[7][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[7][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[8]" type="array">
+         <obj_property name="ElementShortName">[8][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[8][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_neural_nw_inference/tb/a3[9]" type="array">
+         <obj_property name="ElementShortName">[9][0:60]</obj_property>
+         <obj_property name="ObjectShortName">[9][0:60]</obj_property>
+         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="/tb_neural_nw_inference/predicted_val" type="array">
       <obj_property name="ElementShortName">predicted_val[0:3]</obj_property>

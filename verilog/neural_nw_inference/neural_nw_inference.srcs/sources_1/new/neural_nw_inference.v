@@ -83,96 +83,83 @@ reg [3:0] state;
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
-        done = 0;
-        state = IDLE;
-    end
-    else begin
-        case (state)
-            IDLE: idle_state();
-            W12_MULTIPLY: weights_multiply_w12();
-            B12_ADDITION: bias_add_b12();
-            RELU_STAGE1: relu_stage1();
-            W23_MULTIPLY: weights_multiply_w23();
-            B23_ADDITION: bias_add_b23();
-            RELU_STAGE2: relu_stage2();
-            PREDICTION: predict_img_value();
-            FINISHED: finished();
-        endcase
+        done <= 0;
+        state <= IDLE;
     end
 end
 
-// Task definitions
-task idle_state;
-begin
+always @(posedge clk) begin
+
+	if (state == IDLE) begin
     done = 0; //Set the done to ZERO upon beginning
     if (start) begin
-        state = W12_MULTIPLY;
-        count = 0;   
-
         //Initialize all variables being used
         //Input side initialization               
-        w12_mul_test_img[0]  <= 0;  z2[0]  <= 0;  a2[0]  <= 0;
-        w12_mul_test_img[1]  <= 0;  z2[1]  <= 0;  a2[1]  <= 0;
-        w12_mul_test_img[2]  <= 0;  z2[2]  <= 0;  a2[2]  <= 0;
-        w12_mul_test_img[3]  <= 0;  z2[3]  <= 0;  a2[3]  <= 0;
-        w12_mul_test_img[4]  <= 0;  z2[4]  <= 0;  a2[4]  <= 0;
-        w12_mul_test_img[5]  <= 0;  z2[5]  <= 0;  a2[5]  <= 0;
-        w12_mul_test_img[6]  <= 0;  z2[6]  <= 0;  a2[6]  <= 0;
-        w12_mul_test_img[7]  <= 0;  z2[7]  <= 0;  a2[7]  <= 0;
-        w12_mul_test_img[8]  <= 0;  z2[8]  <= 0;  a2[8]  <= 0;
-        w12_mul_test_img[9]  <= 0;  z2[9]  <= 0;  a2[9]  <= 0;
-        w12_mul_test_img[10] <= 0;  z2[10] <= 0;  a2[10] <= 0;
-        w12_mul_test_img[11] <= 0;  z2[11] <= 0;  a2[11] <= 0;
-        w12_mul_test_img[12] <= 0;  z2[12] <= 0;  a2[12] <= 0;
-        w12_mul_test_img[13] <= 0;  z2[13] <= 0;  a2[13] <= 0;
-        w12_mul_test_img[14] <= 0;  z2[14] <= 0;  a2[14] <= 0;
-        w12_mul_test_img[15] <= 0;  z2[15] <= 0;  a2[15] <= 0;
-        w12_mul_test_img[16] <= 0;  z2[16] <= 0;  a2[16] <= 0;
-        w12_mul_test_img[17] <= 0;  z2[17] <= 0;  a2[17] <= 0;
-        w12_mul_test_img[18] <= 0;  z2[18] <= 0;  a2[18] <= 0;
-        w12_mul_test_img[19] <= 0;  z2[19] <= 0;  a2[19] <= 0;
-        w12_mul_test_img[20] <= 0;  z2[20] <= 0;  a2[20] <= 0;
-        w12_mul_test_img[21] <= 0;  z2[21] <= 0;  a2[21] <= 0;
-        w12_mul_test_img[22] <= 0;  z2[22] <= 0;  a2[22] <= 0;
-        w12_mul_test_img[23] <= 0;  z2[23] <= 0;  a2[23] <= 0;
-        w12_mul_test_img[24] <= 0;  z2[24] <= 0;  a2[24] <= 0;
-        w12_mul_test_img[25] <= 0;  z2[25] <= 0;  a2[25] <= 0;
-        w12_mul_test_img[26] <= 0;  z2[26] <= 0;  a2[26] <= 0;
-        w12_mul_test_img[27] <= 0;  z2[27] <= 0;  a2[27] <= 0;
-        w12_mul_test_img[28] <= 0;  z2[28] <= 0;  a2[28] <= 0;
-        w12_mul_test_img[29] <= 0;  z2[29] <= 0;  a2[29] <= 0;
-        w12_mul_test_img[30] <= 0;  z2[30] <= 0;  a2[30] <= 0;
-        w12_mul_test_img[31] <= 0;  z2[31] <= 0;  a2[31] <= 0;
-        w12_mul_test_img[32] <= 0;  z2[32] <= 0;  a2[32] <= 0;
-        w12_mul_test_img[33] <= 0;  z2[33] <= 0;  a2[33] <= 0;
-        w12_mul_test_img[34] <= 0;  z2[34] <= 0;  a2[34] <= 0;
-        w12_mul_test_img[35] <= 0;  z2[35] <= 0;  a2[35] <= 0;
-        w12_mul_test_img[36] <= 0;  z2[36] <= 0;  a2[36] <= 0;
-        w12_mul_test_img[37] <= 0;  z2[37] <= 0;  a2[37] <= 0;
-        w12_mul_test_img[38] <= 0;  z2[38] <= 0;  a2[38] <= 0;
-        w12_mul_test_img[39] <= 0;  z2[39] <= 0;  a2[39] <= 0;
+        w12_mul_test_img[0]  = 0;  z2[0]  = 0;  a2[0]  = 0;
+        w12_mul_test_img[1]  = 0;  z2[1]  = 0;  a2[1]  = 0;
+        w12_mul_test_img[2]  = 0;  z2[2]  = 0;  a2[2]  = 0;
+        w12_mul_test_img[3]  = 0;  z2[3]  = 0;  a2[3]  = 0;
+        w12_mul_test_img[4]  = 0;  z2[4]  = 0;  a2[4]  = 0;
+        w12_mul_test_img[5]  = 0;  z2[5]  = 0;  a2[5]  = 0;
+        w12_mul_test_img[6]  = 0;  z2[6]  = 0;  a2[6]  = 0;
+        w12_mul_test_img[7]  = 0;  z2[7]  = 0;  a2[7]  = 0;
+        w12_mul_test_img[8]  = 0;  z2[8]  = 0;  a2[8]  = 0;
+        w12_mul_test_img[9]  = 0;  z2[9]  = 0;  a2[9]  = 0;
+        w12_mul_test_img[10] = 0;  z2[10] = 0;  a2[10] = 0;
+        w12_mul_test_img[11] = 0;  z2[11] = 0;  a2[11] = 0;
+        w12_mul_test_img[12] = 0;  z2[12] = 0;  a2[12] = 0;
+        w12_mul_test_img[13] = 0;  z2[13] = 0;  a2[13] = 0;
+        w12_mul_test_img[14] = 0;  z2[14] = 0;  a2[14] = 0;
+        w12_mul_test_img[15] = 0;  z2[15] = 0;  a2[15] = 0;
+        w12_mul_test_img[16] = 0;  z2[16] = 0;  a2[16] = 0;
+        w12_mul_test_img[17] = 0;  z2[17] = 0;  a2[17] = 0;
+        w12_mul_test_img[18] = 0;  z2[18] = 0;  a2[18] = 0;
+        w12_mul_test_img[19] = 0;  z2[19] = 0;  a2[19] = 0;
+        w12_mul_test_img[20] = 0;  z2[20] = 0;  a2[20] = 0;
+        w12_mul_test_img[21] = 0;  z2[21] = 0;  a2[21] = 0;
+        w12_mul_test_img[22] = 0;  z2[22] = 0;  a2[22] = 0;
+        w12_mul_test_img[23] = 0;  z2[23] = 0;  a2[23] = 0;
+        w12_mul_test_img[24] = 0;  z2[24] = 0;  a2[24] = 0;
+        w12_mul_test_img[25] = 0;  z2[25] = 0;  a2[25] = 0;
+        w12_mul_test_img[26] = 0;  z2[26] = 0;  a2[26] = 0;
+        w12_mul_test_img[27] = 0;  z2[27] = 0;  a2[27] = 0;
+        w12_mul_test_img[28] = 0;  z2[28] = 0;  a2[28] = 0;
+        w12_mul_test_img[29] = 0;  z2[29] = 0;  a2[29] = 0;
+        w12_mul_test_img[30] = 0;  z2[30] = 0;  a2[30] = 0;
+        w12_mul_test_img[31] = 0;  z2[31] = 0;  a2[31] = 0;
+        w12_mul_test_img[32] = 0;  z2[32] = 0;  a2[32] = 0;
+        w12_mul_test_img[33] = 0;  z2[33] = 0;  a2[33] = 0;
+        w12_mul_test_img[34] = 0;  z2[34] = 0;  a2[34] = 0;
+        w12_mul_test_img[35] = 0;  z2[35] = 0;  a2[35] = 0;
+        w12_mul_test_img[36] = 0;  z2[36] = 0;  a2[36] = 0;
+        w12_mul_test_img[37] = 0;  z2[37] = 0;  a2[37] = 0;
+        w12_mul_test_img[38] = 0;  z2[38] = 0;  a2[38] = 0;
+        w12_mul_test_img[39] = 0;  z2[39] = 0;  a2[39] = 0;
 		
 	//Output side initialization
-        w23_mul_a2[0]  <= 0;  z3[0]  <= 0;  a3[0]  <= 0;
-        w23_mul_a2[1]  <= 0;  z3[1]  <= 0;  a3[1]  <= 0;
-        w23_mul_a2[2]  <= 0;  z3[2]  <= 0;  a3[2]  <= 0;
-        w23_mul_a2[3]  <= 0;  z3[3]  <= 0;  a3[3]  <= 0;
-        w23_mul_a2[4]  <= 0;  z3[4]  <= 0;  a3[4]  <= 0;
-        w23_mul_a2[5]  <= 0;  z3[5]  <= 0;  a3[5]  <= 0;
-        w23_mul_a2[6]  <= 0;  z3[6]  <= 0;  a3[6]  <= 0;
-        w23_mul_a2[7]  <= 0;  z3[7]  <= 0;  a3[7]  <= 0;
-        w23_mul_a2[8]  <= 0;  z3[8]  <= 0;  a3[8]  <= 0;
-        w23_mul_a2[9]  <= 0;  z3[9]  <= 0;  a3[9]  <= 0;   
+        w23_mul_a2[0]  = 0;  z3[0]  = 0;  a3[0]  = 0;
+        w23_mul_a2[1]  = 0;  z3[1]  = 0;  a3[1]  = 0;
+        w23_mul_a2[2]  = 0;  z3[2]  = 0;  a3[2]  = 0;
+        w23_mul_a2[3]  = 0;  z3[3]  = 0;  a3[3]  = 0;
+        w23_mul_a2[4]  = 0;  z3[4]  = 0;  a3[4]  = 0;
+        w23_mul_a2[5]  = 0;  z3[5]  = 0;  a3[5]  = 0;
+        w23_mul_a2[6]  = 0;  z3[6]  = 0;  a3[6]  = 0;
+        w23_mul_a2[7]  = 0;  z3[7]  = 0;  a3[7]  = 0;
+        w23_mul_a2[8]  = 0;  z3[8]  = 0;  a3[8]  = 0;
+        w23_mul_a2[9]  = 0;  z3[9]  = 0;  a3[9]  = 0;   
         
-        max_a3 <= 0;
-        max_index <= 0;
-        
+        max_a3 = 0;
+        max_index = 0;
+        state = W12_MULTIPLY;
+        count = 0;   
     end
+	end
 end
-endtask
 
-task weights_multiply_w12;
-begin
+always @(posedge clk) begin
+
+	if (state == W12_MULTIPLY) begin
+
     //Multiply w12  with input test image
     w12_mul_test_img[0]  <= w12_mul_test_img[0] + w12[0][count]*test_img[count];
     w12_mul_test_img[1]  <= w12_mul_test_img[1] + w12[1][count]*test_img[count];
@@ -215,51 +202,54 @@ begin
     w12_mul_test_img[38] <= w12_mul_test_img[38] + w12[38][count]*test_img[count];
     w12_mul_test_img[39] <= w12_mul_test_img[39] + w12[39][count]*test_img[count];
     
-    count = count+1;
+    count <= count+1;
     
     if ( count == 255 ) begin
-        state = B12_ADDITION; //W12 Multiplication done. Now, go to B12_ADDITION
-        count = 0;
+        state <= B12_ADDITION; //W12 Multiplication done. Now, go to B12_ADDITION
+        count <= 0;
     end
 
+	end
 end
-endtask
 
-task bias_add_b12;
-begin
+always @(posedge clk) begin
+
+	if (state == B12_ADDITION) begin
     //Add Biases from B12
-    z2[count] = w12_mul_test_img[count] + b12[count];
+    z2[count] <= w12_mul_test_img[count] + b12[count];
 
-    count = count+1;
+    count <= count+1;
     if ( count == 40 ) begin
-        state = RELU_STAGE1; //B12 addition done. Now, go to RELU state
-        count = 0;
+        state <= RELU_STAGE1; //B12 addition done. Now, go to RELU state
+        count <= 0;
     end    
 end
-endtask
+end
 
-task relu_stage1;
-begin
+always @(posedge clk) begin
+
+	if (state == RELU_STAGE1) begin
     //LEAKY RELU
     if (z2[count]>0) begin
-        a2[count] = z2[count] * $signed(relu_multiply_1);   //Multiply by 1
+        a2[count] <= z2[count] * $signed(relu_multiply_1);   //Multiply by 1
     end
     else begin
-        a2[count] = z2[count] * $signed(relu_multiply_slope);  //Multiply with Slope
+        a2[count] <= z2[count] * $signed(relu_multiply_slope);  //Multiply with Slope
     end
 
-    count = count+1;
+    count <= count+1;
     if ( count == 40 ) begin
-        state = W23_MULTIPLY; //RELU done. Now, go to prediction state
-        count = 0;
+        state <= W23_MULTIPLY; //RELU done. Now, go to prediction state
+        count <= 0;
     end    
+	end
 end
-endtask
 
-task weights_multiply_w23;
-begin
+always @(posedge clk) begin
 
-    //Multiply w23  B23
+	if (state == W23_MULTIPLY) begin
+
+    //Multiply w23  a2
     w23_mul_a2[0]  <= w23_mul_a2[0] + w23[0][count]*a2[count];
     w23_mul_a2[1]  <= w23_mul_a2[1] + w23[1][count]*a2[count];
     w23_mul_a2[2]  <= w23_mul_a2[2] + w23[2][count]*a2[count];
@@ -271,72 +261,77 @@ begin
     w23_mul_a2[8]  <= w23_mul_a2[8] + w23[8][count]*a2[count];
     w23_mul_a2[9]  <= w23_mul_a2[9] + w23[9][count]*a2[count];
 
-    count = count+1;
+    count <= count+1;
     if ( count == 40 ) begin
-        state = B23_ADDITION;
-        count = 0;
+        state <= B23_ADDITION;
+        count <= 0;
     end    
 
+	end
 end
-endtask
 
-task bias_add_b23;
-begin
+always @(posedge clk) begin
+
+	if (state == B23_ADDITION) begin
 
     //Add Biases from B23
-    z3[count] = w23_mul_a2[count] + b23[count];
+    z3[count] <= w23_mul_a2[count] + b23[count];
 
-    count = count+1;
+    count <= count+1;
     if ( count == 10 ) begin
-        state = RELU_STAGE2; //B23 addition done. Now, go to RELU state
-        count = 0;
+        state <= RELU_STAGE2; //B23 addition done. Now, go to RELU state
+        count <= 0;
     end    
 
+	end
 end
-endtask
 
-task relu_stage2;
-begin
+always @(posedge clk) begin
+
+	if (state == RELU_STAGE2) begin
     //LEAKY RELU
     if (z3[count]>0) begin
-        a3[count] = z3[count] * $signed(relu_multiply_1);  //Multiply by 1
+        a3[count] <= z3[count] * $signed(relu_multiply_1);  //Multiply by 1
     end
     else begin
-        a3[count] = z3[count] * $signed(relu_multiply_slope);  //Multiply with Slope
+        a3[count] <= z3[count] * $signed(relu_multiply_slope);  //Multiply with Slope
     end
 
-    count = count+1;
+    count <= count+1;
     if ( count == 10 ) begin
-        state = PREDICTION; //RELU done. Now, go to prediction state
-        count = 0;
+        state <= PREDICTION; //RELU done. Now, go to prediction state
+        count <= 0;
     end    
 end
-endtask
+end
 
-task predict_img_value;
-begin
+always @(posedge clk) begin
+
+	if (state == PREDICTION) begin
    //Find the MAX 
     if (a3[count] >= max_a3) begin
         max_a3 <= a3[count];
         max_index <= count;
     end
    
-    count = count+1;
+    count <= count+1;
     if ( count == 10 ) begin
-        state = FINISHED; //RELU done. Now, go to FINISHED state
-        count = 0;
+        state <= FINISHED; //MAX find done. Now, go to FINISHED state
+        count <= 0;
     end   
-    predicted_val = max_index;
+    predicted_val <= max_index;
 end
-endtask
+end
 
-task finished;
-begin
+always @(posedge clk) begin
+
+	if (state == FINISHED) begin
+
     done = 1;
     state = IDLE;
     
 end
-endtask
+end
 
 
 
