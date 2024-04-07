@@ -151,8 +151,8 @@ always @(posedge clk) begin
         
         max_a3 = 0;
         max_index = 0;
-        state = W12_MULTIPLY;
         count = 0;   
+        state = W12_MULTIPLY;  //Go to W12 Multiplication
     end
 	end
 end
@@ -206,8 +206,8 @@ always @(posedge clk) begin
     count <= count+1;
     
     if ( count == 255 ) begin
-        state <= B12_ADDITION; //W12 Multiplication done. Now, go to B12_ADDITION
         count <= 0;
+        state <= B12_ADDITION; //W12 Multiplication done. Now, go to B12_ADDITION
     end
 
 	end
@@ -217,14 +217,49 @@ always @(posedge clk) begin
 
 	if (state == B12_ADDITION) begin
     //Add Biases from B12
-    z2[count] <= w12_mul_test_img[count] + b12[count];
+    z2[0] = w12_mul_test_img[0] + b12[0];
+    z2[1] = w12_mul_test_img[1] + b12[1];
+    z2[2] = w12_mul_test_img[2] + b12[2];
+    z2[3] = w12_mul_test_img[3] + b12[3];
+    z2[4] = w12_mul_test_img[4] + b12[4];
+    z2[5] = w12_mul_test_img[5] + b12[5];
+    z2[6] = w12_mul_test_img[6] + b12[6];
+    z2[7] = w12_mul_test_img[7] + b12[7];
+    z2[8] = w12_mul_test_img[8] + b12[8];
+    z2[9] = w12_mul_test_img[9] + b12[9];
+    z2[10] = w12_mul_test_img[10] + b12[10];
+    z2[11] = w12_mul_test_img[11] + b12[11];
+    z2[12] = w12_mul_test_img[12] + b12[12];
+    z2[13] = w12_mul_test_img[13] + b12[13];
+    z2[14] = w12_mul_test_img[14] + b12[14];
+    z2[15] = w12_mul_test_img[15] + b12[15];
+    z2[16] = w12_mul_test_img[16] + b12[16];
+    z2[17] = w12_mul_test_img[17] + b12[17];
+    z2[18] = w12_mul_test_img[18] + b12[18];
+    z2[19] = w12_mul_test_img[19] + b12[19];
+    z2[20] = w12_mul_test_img[20] + b12[20];
+    z2[21] = w12_mul_test_img[21] + b12[21];
+    z2[22] = w12_mul_test_img[22] + b12[22];
+    z2[23] = w12_mul_test_img[23] + b12[23];
+    z2[24] = w12_mul_test_img[24] + b12[24];
+    z2[25] = w12_mul_test_img[25] + b12[25];
+    z2[26] = w12_mul_test_img[26] + b12[26];
+    z2[27] = w12_mul_test_img[27] + b12[27];
+    z2[28] = w12_mul_test_img[28] + b12[28];
+    z2[29] = w12_mul_test_img[29] + b12[29];
+    z2[30] = w12_mul_test_img[30] + b12[30];
+    z2[31] = w12_mul_test_img[31] + b12[31];
+    z2[32] = w12_mul_test_img[32] + b12[32];
+    z2[33] = w12_mul_test_img[33] + b12[33];
+    z2[34] = w12_mul_test_img[34] + b12[34];
+    z2[35] = w12_mul_test_img[35] + b12[35];
+    z2[36] = w12_mul_test_img[36] + b12[36];
+    z2[37] = w12_mul_test_img[37] + b12[37];
+    z2[38] = w12_mul_test_img[38] + b12[38];
+    z2[39] = w12_mul_test_img[39] + b12[39];
 
-    count <= count+1;
-    if ( count == 39 ) begin
-        state <= RELU_STAGE1; //B12 addition done. Now, go to RELU state
-        count <= 0;
-    end    
-end
+    state = RELU_STAGE1; //B12 addition done. Now, go to RELU state
+    end
 end
 
 always @(posedge clk) begin
@@ -240,8 +275,8 @@ always @(posedge clk) begin
 
     count <= count+1;
     if ( count == 39 ) begin
-        state <= W23_MULTIPLY; //RELU done. Now, go to prediction state
         count <= 0;
+        state <= W23_MULTIPLY; //RELU done. Now, go to prediction state
     end    
 	end
 end
@@ -264,8 +299,8 @@ always @(posedge clk) begin
 
     count <= count+1;
     if ( count == 39 ) begin
-        state <= B23_ADDITION;
         count <= 0;
+        state <= B23_ADDITION;
     end    
 
 	end
@@ -274,16 +309,20 @@ end
 always @(posedge clk) begin
 
 	if (state == B23_ADDITION) begin
-
     //Add Biases from B23
-    z3[count] <= w23_mul_a2[count] + b23[count];
+    z3[0] = w23_mul_a2[0] + b23[0];
+    z3[1] = w23_mul_a2[1] + b23[1];
+    z3[2] = w23_mul_a2[2] + b23[2];
+    z3[3] = w23_mul_a2[3] + b23[3];
+    z3[4] = w23_mul_a2[4] + b23[4];
+    z3[5] = w23_mul_a2[5] + b23[5];
+    z3[6] = w23_mul_a2[6] + b23[6];
+    z3[7] = w23_mul_a2[7] + b23[7];
+    z3[8] = w23_mul_a2[8] + b23[8];
+    z3[9] = w23_mul_a2[9] + b23[9];
 
-    count <= count+1;
-    if ( count == 9 ) begin
-        state <= RELU_STAGE2; //B23 addition done. Now, go to RELU state
-        count <= 0;
-    end    
-
+    state = RELU_STAGE2; //B23 addition done. Now, go to RELU state
+    count = 0;
 	end
 end
 
@@ -300,8 +339,8 @@ always @(posedge clk) begin
 
     count <= count+1;
     if ( count == 9 ) begin
-        state <= PREDICTION; //RELU done. Now, go to prediction state
         count <= 0;
+        state <= PREDICTION; //RELU done. Now, go to prediction state
     end    
 end
 end
@@ -317,11 +356,11 @@ always @(posedge clk) begin
    
     count <= count+1;
     if ( count == 9 ) begin
-        state <= FINISHED; //MAX find done. Now, go to FINISHED state
         count <= 0;
+        predicted_val <= max_index;
+        state <= FINISHED; //MAX find done. Now, go to FINISHED state
     end   
-    predicted_val <= max_index;
-end
+    end
 end
 
 always @(posedge clk) begin
