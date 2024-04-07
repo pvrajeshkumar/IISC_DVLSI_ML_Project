@@ -310,16 +310,16 @@ always @(posedge clk) begin
 
 	if (state == B23_ADDITION) begin
     //Add Biases from B23
-    z3[0] = w23_mul_a2[0] + b23[0];
-    z3[1] = w23_mul_a2[1] + b23[1];
-    z3[2] = w23_mul_a2[2] + b23[2];
-    z3[3] = w23_mul_a2[3] + b23[3];
-    z3[4] = w23_mul_a2[4] + b23[4];
-    z3[5] = w23_mul_a2[5] + b23[5];
-    z3[6] = w23_mul_a2[6] + b23[6];
-    z3[7] = w23_mul_a2[7] + b23[7];
-    z3[8] = w23_mul_a2[8] + b23[8];
-    z3[9] = w23_mul_a2[9] + b23[9];
+    z3[0] = w23_mul_a2[0] + b23_shifted[0];
+    z3[1] = w23_mul_a2[1] + b23_shifted[1];
+    z3[2] = w23_mul_a2[2] + b23_shifted[2];
+    z3[3] = w23_mul_a2[3] + b23_shifted[3];
+    z3[4] = w23_mul_a2[4] + b23_shifted[4];
+    z3[5] = w23_mul_a2[5] + b23_shifted[5];
+    z3[6] = w23_mul_a2[6] + b23_shifted[6];
+    z3[7] = w23_mul_a2[7] + b23_shifted[7];
+    z3[8] = w23_mul_a2[8] + b23_shifted[8];
+    z3[9] = w23_mul_a2[9] + b23_shifted[9];
 
     state = RELU_STAGE2; //B23 addition done. Now, go to RELU state
     count = 0;
