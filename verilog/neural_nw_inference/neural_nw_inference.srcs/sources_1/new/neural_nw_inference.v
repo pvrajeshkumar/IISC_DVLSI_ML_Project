@@ -81,9 +81,10 @@ parameter FINISHED      =   4'b1000;
 reg [3:0] state;
 
 
-always @(posedge clk, posedge rst) begin
+always @(posedge clk) begin
     if( rst ) begin
         done <= 0;
+        predicted_val <=0;
         state <= IDLE;
     end
 end
@@ -219,7 +220,7 @@ always @(posedge clk) begin
     z2[count] <= w12_mul_test_img[count] + b12[count];
 
     count <= count+1;
-    if ( count == 40 ) begin
+    if ( count == 39 ) begin
         state <= RELU_STAGE1; //B12 addition done. Now, go to RELU state
         count <= 0;
     end    
@@ -238,7 +239,7 @@ always @(posedge clk) begin
     end
 
     count <= count+1;
-    if ( count == 40 ) begin
+    if ( count == 39 ) begin
         state <= W23_MULTIPLY; //RELU done. Now, go to prediction state
         count <= 0;
     end    
@@ -262,7 +263,7 @@ always @(posedge clk) begin
     w23_mul_a2[9]  <= w23_mul_a2[9] + w23[9][count]*a2[count];
 
     count <= count+1;
-    if ( count == 40 ) begin
+    if ( count == 39 ) begin
         state <= B23_ADDITION;
         count <= 0;
     end    
@@ -278,7 +279,7 @@ always @(posedge clk) begin
     z3[count] <= w23_mul_a2[count] + b23[count];
 
     count <= count+1;
-    if ( count == 10 ) begin
+    if ( count == 9 ) begin
         state <= RELU_STAGE2; //B23 addition done. Now, go to RELU state
         count <= 0;
     end    
@@ -298,7 +299,7 @@ always @(posedge clk) begin
     end
 
     count <= count+1;
-    if ( count == 10 ) begin
+    if ( count == 9 ) begin
         state <= PREDICTION; //RELU done. Now, go to prediction state
         count <= 0;
     end    
@@ -315,7 +316,7 @@ always @(posedge clk) begin
     end
    
     count <= count+1;
-    if ( count == 10 ) begin
+    if ( count == 9 ) begin
         state <= FINISHED; //MAX find done. Now, go to FINISHED state
         count <= 0;
     end   
