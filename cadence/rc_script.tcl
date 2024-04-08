@@ -10,11 +10,8 @@ set_attribute syn_generic_effort low /
 
 set_attribute information_level 2 /
 set_attribute optimize_constant_0_flops false /
-set_attribute optimize_constant_0_seq false /
 set_attribute optimize_constant_1_flops false /
-set_attribute optimize_constant_1_seq false /
-set_attribute optimize_constant_latches false /
-#set_attribute optimize_constant_feedback_seqs false /
+set_attribute optimize_constant_feedback_seqs false /
 
 syn_generic
 set_attribute syn_map_effort low /
@@ -23,9 +20,11 @@ set_attribute syn_opt_effort low /
 syn_opt
 
 write_hdl > neural_nw_inference_netlist.v
-write_sdc > counter_sdc.sdc
+write_sdc > neural_nw_inference_sdc.sdc
 write_sdf -timescale ns -nonegchecks -recrem split -edges check_edge > delays.sdf
 report qor > qor.rpt
 report_power > power.rpt
+
 gui_show
+
 #exit
