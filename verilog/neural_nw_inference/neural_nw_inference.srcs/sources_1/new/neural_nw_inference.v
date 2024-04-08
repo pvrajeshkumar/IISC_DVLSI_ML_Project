@@ -78,7 +78,7 @@ parameter RELU_STAGE2   =   4'b0110;
 parameter PREDICTION    =   4'b0111;
 parameter FINISHED      =   4'b1000;
 
-reg [3:0] state;
+reg [0:3] state;
 
 
 always @(posedge clk) begin
