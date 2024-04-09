@@ -23,9 +23,9 @@ fileID = fopen("w12.v", "w");
 for i=1:hidden_nodes
     for j=1:pixels_in_input_img
         if( w12_fix_int(i,j) < 0 )
-            fprintf(fileID, "assign w12[%d][%d] = -%d'd%d;\n", i-1, j-1, totalbits, abs(w12_fix_int(i,j)));
+            fprintf(fileID, "assign w12[%d][%d] = -%d'd%d;\n", i-1, j-1, totalbits+1, abs(w12_fix_int(i,j)));
         else
-            fprintf(fileID, "assign w12[%d][%d] = %d'd%d;\n", i-1, j-1, totalbits, w12_fix_int(i,j));
+            fprintf(fileID, "assign w12[%d][%d] = %d'd%d;\n", i-1, j-1, totalbits+1, w12_fix_int(i,j));
         end    
     end
 end
