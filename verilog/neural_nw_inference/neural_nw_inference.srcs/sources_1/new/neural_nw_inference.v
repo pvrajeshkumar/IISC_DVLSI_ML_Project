@@ -50,20 +50,20 @@ wire signed [0:15] b23 [0:9];
 //Input side
 reg signed [0:16] w12_mul_test_img[0:39];                   //[MATLAB]: z2_interim = w12_fix_int * a1; % (Q16.8 * Q1.0 = Q17.8).
 reg signed [0:16] z2[0:39];     //w12_mul_test_img+b12      //[MATLAB]: z2 = z2_interim + b12_fix_int; % Q17.8 + Q16.8 = Q17.8
-reg signed [0:27] a2[0:39];                                 //[MATLAB]: a2 = leaky_relu_fixp(z2);  % Q11.8 * Q17.8 = Q28.16
+reg signed [0:32] a2[0:39];                                 //[MATLAB]: a2 = leaky_relu_fixp(z2);  % Q16.8 * Q17.8 = Q33.16
 
 //Output side
-reg signed [0:43] w23_mul_a2[0:9];                          //[MATLAB]: z3_interim = w23_fix_int * a2; % (Q16.8 * Q28.16 = Q44.24).
-wire signed [0:31] b23_shifted[0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
-reg signed [0:43] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
-reg signed [0:60] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q44.24 * Q17.8 = Q61.32
+reg signed [0:48] w23_mul_a2[0:9];                          //[MATLAB]: z3_interim = w23_fix_int * a2; % (Q16.8 * Q33.16 = Q49.24).
+wire signed [0:48] b23_shifted[0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
+reg signed [0:48] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q49.24 + Q32.24 = Q49.24
+reg signed [0:64] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q49.24 * Q16.8 = Q65.32
 
 //RELU Parameters from MATLAB test output
 parameter relu_multiply_1 = 16'd256;
 parameter relu_multiply_slope = 16'd12;
 
 integer count;  //For loop counts
-reg signed [0:60] max_a3;
+reg signed [0:64] max_a3;
 reg signed [0:3] max_index;
 
 

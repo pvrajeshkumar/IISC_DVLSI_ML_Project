@@ -52,12 +52,12 @@ for i = 1:testd
     z2_interim = w12_fix_int * a1; % (Q16.8 * Q1.0 = Q17.8). Interim var for fixed point conv
     z2 = z2_interim + b12_fix_int; % Q17.8 + Q16.8 = Q17.8
     %Apply RELU with Fixed point representation
-    a2 = leaky_relu_fixp(z2);  % Q11.8 * Q17.8 = Q28.16
+    a2 = leaky_relu_fixp(z2);  % Q16.8 * Q17.8 = Q33.16
 
     %Convert below to Fixed Point Representation
     % z3 = w23*a2 + b23;
     % a3 = leaky_relu(z3); %Output vector
-    z3_interim = w23_fix_int * a2; % (Q16.8 * Q28.16 = Q44.24). Interim var for fixed point conv
+    z3_interim = w23_fix_int * a2; % (Q16.8 * Q33.16 = Q49.24). Interim var for fixed point conv
     %b23_fix_int_inz3_interim Q Point
     b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
     z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
