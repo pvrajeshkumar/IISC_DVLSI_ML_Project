@@ -54,7 +54,7 @@ reg signed [0:32] a2[0:39];                                 //[MATLAB]: a2 = lea
 
 //Output side
 reg signed [0:48] w23_mul_a2[0:9];                          //[MATLAB]: z3_interim = w23_fix_int * a2; % (Q16.8 * Q33.16 = Q49.24).
-wire signed [0:49] b23_shifted[0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
+wire signed [0:49] b23_shifted[0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %Shift by 16 bits o convert to Q.24 format
 reg signed [0:48] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q49.24 + Q32.24 = Q49.24
 reg signed [0:64] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q49.24 * Q16.8 = Q65.32
 
@@ -11075,7 +11075,7 @@ assign b23[7] = 16'd204;
 assign b23[8] = -16'd204;
 assign b23[9] = -16'd69;
 
-
+//Shift existing Q.8 point by 16 bits to get Q.24 
 assign b23_shifted[0] = b23[0] <<< 16;
 assign b23_shifted[1] = b23[1] <<< 16;
 assign b23_shifted[2] = b23[2] <<< 16;

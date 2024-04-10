@@ -59,10 +59,10 @@ for i = 1:testd
     % a3 = leaky_relu(z3); %Output vector
     z3_interim = w23_fix_int * a2; % (Q16.8 * Q33.16 = Q49.24). Interim var for fixed point conv
     %b23_fix_int_inz3_interim Q Point
-    b23_fix_int_interim = b23_fix_int * 2^16; %To convert to Q.24 format
-    z3 = z3_interim + b23_fix_int_interim;  % Q44.24 + Q32.24 = Q44.24
+    b23_fix_int_interim = b23_fix_int * 2^16; %Shift by 16 bits To convert to Q.24 format
+    z3 = z3_interim + b23_fix_int_interim;  % Q49.24 + Q32.24 = Q49.24
     %Apply RELU with Fixed point representation
-    a3 = leaky_relu_fixp(z3);
+    a3 = leaky_relu_fixp(z3); % Q49.24 * Q16.8 = Q65.32
 
     %Get the index of the maximum output
     [maxv1,index1] = max(a3);
