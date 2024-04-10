@@ -358,6 +358,7 @@ always @(posedge clk) begin
     if ( count == 9 ) begin
         count <= 0;
         predicted_val <= max_index;
+	done = 1;
         state <= FINISHED; //MAX find done. Now, go to FINISHED state
     end   
     end
@@ -367,7 +368,6 @@ always @(posedge clk) begin
 
 	if (state == FINISHED) begin
 
-    done = 1;
     state = IDLE;
     
 end
