@@ -87,79 +87,91 @@ always @(posedge clk) begin
         predicted_val <=0;
         state <= IDLE;
     end
-end
-
-always @(posedge clk) begin
-
-	if (state == IDLE) begin
-    done = 0; //Set the done to ZERO upon beginning
-    if (start) begin
-        //Initialize all variables being used
-        //Input side initialization               
-        w12_mul_test_img[0]  = 0;  z2[0]  = 0;  a2[0]  = 0;
-        w12_mul_test_img[1]  = 0;  z2[1]  = 0;  a2[1]  = 0;
-        w12_mul_test_img[2]  = 0;  z2[2]  = 0;  a2[2]  = 0;
-        w12_mul_test_img[3]  = 0;  z2[3]  = 0;  a2[3]  = 0;
-        w12_mul_test_img[4]  = 0;  z2[4]  = 0;  a2[4]  = 0;
-        w12_mul_test_img[5]  = 0;  z2[5]  = 0;  a2[5]  = 0;
-        w12_mul_test_img[6]  = 0;  z2[6]  = 0;  a2[6]  = 0;
-        w12_mul_test_img[7]  = 0;  z2[7]  = 0;  a2[7]  = 0;
-        w12_mul_test_img[8]  = 0;  z2[8]  = 0;  a2[8]  = 0;
-        w12_mul_test_img[9]  = 0;  z2[9]  = 0;  a2[9]  = 0;
-        w12_mul_test_img[10] = 0;  z2[10] = 0;  a2[10] = 0;
-        w12_mul_test_img[11] = 0;  z2[11] = 0;  a2[11] = 0;
-        w12_mul_test_img[12] = 0;  z2[12] = 0;  a2[12] = 0;
-        w12_mul_test_img[13] = 0;  z2[13] = 0;  a2[13] = 0;
-        w12_mul_test_img[14] = 0;  z2[14] = 0;  a2[14] = 0;
-        w12_mul_test_img[15] = 0;  z2[15] = 0;  a2[15] = 0;
-        w12_mul_test_img[16] = 0;  z2[16] = 0;  a2[16] = 0;
-        w12_mul_test_img[17] = 0;  z2[17] = 0;  a2[17] = 0;
-        w12_mul_test_img[18] = 0;  z2[18] = 0;  a2[18] = 0;
-        w12_mul_test_img[19] = 0;  z2[19] = 0;  a2[19] = 0;
-        w12_mul_test_img[20] = 0;  z2[20] = 0;  a2[20] = 0;
-        w12_mul_test_img[21] = 0;  z2[21] = 0;  a2[21] = 0;
-        w12_mul_test_img[22] = 0;  z2[22] = 0;  a2[22] = 0;
-        w12_mul_test_img[23] = 0;  z2[23] = 0;  a2[23] = 0;
-        w12_mul_test_img[24] = 0;  z2[24] = 0;  a2[24] = 0;
-        w12_mul_test_img[25] = 0;  z2[25] = 0;  a2[25] = 0;
-        w12_mul_test_img[26] = 0;  z2[26] = 0;  a2[26] = 0;
-        w12_mul_test_img[27] = 0;  z2[27] = 0;  a2[27] = 0;
-        w12_mul_test_img[28] = 0;  z2[28] = 0;  a2[28] = 0;
-        w12_mul_test_img[29] = 0;  z2[29] = 0;  a2[29] = 0;
-        w12_mul_test_img[30] = 0;  z2[30] = 0;  a2[30] = 0;
-        w12_mul_test_img[31] = 0;  z2[31] = 0;  a2[31] = 0;
-        w12_mul_test_img[32] = 0;  z2[32] = 0;  a2[32] = 0;
-        w12_mul_test_img[33] = 0;  z2[33] = 0;  a2[33] = 0;
-        w12_mul_test_img[34] = 0;  z2[34] = 0;  a2[34] = 0;
-        w12_mul_test_img[35] = 0;  z2[35] = 0;  a2[35] = 0;
-        w12_mul_test_img[36] = 0;  z2[36] = 0;  a2[36] = 0;
-        w12_mul_test_img[37] = 0;  z2[37] = 0;  a2[37] = 0;
-        w12_mul_test_img[38] = 0;  z2[38] = 0;  a2[38] = 0;
-        w12_mul_test_img[39] = 0;  z2[39] = 0;  a2[39] = 0;
-		
-	//Output side initialization
-        w23_mul_a2[0]  = 0;  z3[0]  = 0;  a3[0]  = 0;
-        w23_mul_a2[1]  = 0;  z3[1]  = 0;  a3[1]  = 0;
-        w23_mul_a2[2]  = 0;  z3[2]  = 0;  a3[2]  = 0;
-        w23_mul_a2[3]  = 0;  z3[3]  = 0;  a3[3]  = 0;
-        w23_mul_a2[4]  = 0;  z3[4]  = 0;  a3[4]  = 0;
-        w23_mul_a2[5]  = 0;  z3[5]  = 0;  a3[5]  = 0;
-        w23_mul_a2[6]  = 0;  z3[6]  = 0;  a3[6]  = 0;
-        w23_mul_a2[7]  = 0;  z3[7]  = 0;  a3[7]  = 0;
-        w23_mul_a2[8]  = 0;  z3[8]  = 0;  a3[8]  = 0;
-        w23_mul_a2[9]  = 0;  z3[9]  = 0;  a3[9]  = 0;   
-        
-        max_a3 = 0;
-        max_index = 0;
-        count = 0;   
-        state = W12_MULTIPLY;  //Go to W12 Multiplication
-    end
+	else begin
+        case (state)
+            IDLE: idle_state();
+            W12_MULTIPLY: weights_multiply_w12();
+            B12_ADDITION: bias_add_b12();
+            RELU_STAGE1: relu_stage1();
+            W23_MULTIPLY: weights_multiply_w23();
+            B23_ADDITION: bias_add_b23();
+            RELU_STAGE2: relu_stage2();
+            PREDICTION: predict_img_value();
+            FINISHED: finished();
+        endcase	
 	end
 end
 
-always @(posedge clk) begin
+// Task definitions
+task idle_state;
+begin
+    done <= 0; //Set the done to ZERO upon beginning
+    if (start) begin
+        //Initialize all variables being used
+        //Input side initialization               
+        w12_mul_test_img[0]  <= 0;  z2[0]  <= 0;  a2[0]  <= 0;
+        w12_mul_test_img[1]  <= 0;  z2[1]  <= 0;  a2[1]  <= 0;
+        w12_mul_test_img[2]  <= 0;  z2[2]  <= 0;  a2[2]  <= 0;
+        w12_mul_test_img[3]  <= 0;  z2[3]  <= 0;  a2[3]  <= 0;
+        w12_mul_test_img[4]  <= 0;  z2[4]  <= 0;  a2[4]  <= 0;
+        w12_mul_test_img[5]  <= 0;  z2[5]  <= 0;  a2[5]  <= 0;
+        w12_mul_test_img[6]  <= 0;  z2[6]  <= 0;  a2[6]  <= 0;
+        w12_mul_test_img[7]  <= 0;  z2[7]  <= 0;  a2[7]  <= 0;
+        w12_mul_test_img[8]  <= 0;  z2[8]  <= 0;  a2[8]  <= 0;
+        w12_mul_test_img[9]  <= 0;  z2[9]  <= 0;  a2[9]  <= 0;
+        w12_mul_test_img[10] <= 0;  z2[10] <= 0;  a2[10] <= 0;
+        w12_mul_test_img[11] <= 0;  z2[11] <= 0;  a2[11] <= 0;
+        w12_mul_test_img[12] <= 0;  z2[12] <= 0;  a2[12] <= 0;
+        w12_mul_test_img[13] <= 0;  z2[13] <= 0;  a2[13] <= 0;
+        w12_mul_test_img[14] <= 0;  z2[14] <= 0;  a2[14] <= 0;
+        w12_mul_test_img[15] <= 0;  z2[15] <= 0;  a2[15] <= 0;
+        w12_mul_test_img[16] <= 0;  z2[16] <= 0;  a2[16] <= 0;
+        w12_mul_test_img[17] <= 0;  z2[17] <= 0;  a2[17] <= 0;
+        w12_mul_test_img[18] <= 0;  z2[18] <= 0;  a2[18] <= 0;
+        w12_mul_test_img[19] <= 0;  z2[19] <= 0;  a2[19] <= 0;
+        w12_mul_test_img[20] <= 0;  z2[20] <= 0;  a2[20] <= 0;
+        w12_mul_test_img[21] <= 0;  z2[21] <= 0;  a2[21] <= 0;
+        w12_mul_test_img[22] <= 0;  z2[22] <= 0;  a2[22] <= 0;
+        w12_mul_test_img[23] <= 0;  z2[23] <= 0;  a2[23] <= 0;
+        w12_mul_test_img[24] <= 0;  z2[24] <= 0;  a2[24] <= 0;
+        w12_mul_test_img[25] <= 0;  z2[25] <= 0;  a2[25] <= 0;
+        w12_mul_test_img[26] <= 0;  z2[26] <= 0;  a2[26] <= 0;
+        w12_mul_test_img[27] <= 0;  z2[27] <= 0;  a2[27] <= 0;
+        w12_mul_test_img[28] <= 0;  z2[28] <= 0;  a2[28] <= 0;
+        w12_mul_test_img[29] <= 0;  z2[29] <= 0;  a2[29] <= 0;
+        w12_mul_test_img[30] <= 0;  z2[30] <= 0;  a2[30] <= 0;
+        w12_mul_test_img[31] <= 0;  z2[31] <= 0;  a2[31] <= 0;
+        w12_mul_test_img[32] <= 0;  z2[32] <= 0;  a2[32] <= 0;
+        w12_mul_test_img[33] <= 0;  z2[33] <= 0;  a2[33] <= 0;
+        w12_mul_test_img[34] <= 0;  z2[34] <= 0;  a2[34] <= 0;
+        w12_mul_test_img[35] <= 0;  z2[35] <= 0;  a2[35] <= 0;
+        w12_mul_test_img[36] <= 0;  z2[36] <= 0;  a2[36] <= 0;
+        w12_mul_test_img[37] <= 0;  z2[37] <= 0;  a2[37] <= 0;
+        w12_mul_test_img[38] <= 0;  z2[38] <= 0;  a2[38] <= 0;
+        w12_mul_test_img[39] <= 0;  z2[39] <= 0;  a2[39] <= 0;
+		
+	//Output side initialization
+        w23_mul_a2[0]  <= 0;  z3[0]  <= 0;  a3[0]  <= 0;
+        w23_mul_a2[1]  <= 0;  z3[1]  <= 0;  a3[1]  <= 0;
+        w23_mul_a2[2]  <= 0;  z3[2]  <= 0;  a3[2]  <= 0;
+        w23_mul_a2[3]  <= 0;  z3[3]  <= 0;  a3[3]  <= 0;
+        w23_mul_a2[4]  <= 0;  z3[4]  <= 0;  a3[4]  <= 0;
+        w23_mul_a2[5]  <= 0;  z3[5]  <= 0;  a3[5]  <= 0;
+        w23_mul_a2[6]  <= 0;  z3[6]  <= 0;  a3[6]  <= 0;
+        w23_mul_a2[7]  <= 0;  z3[7]  <= 0;  a3[7]  <= 0;
+        w23_mul_a2[8]  <= 0;  z3[8]  <= 0;  a3[8]  <= 0;
+        w23_mul_a2[9]  <= 0;  z3[9]  <= 0;  a3[9]  <= 0;   
+        
+        max_a3 <= 0;
+        max_index <= 0;
+        count <= 0;   
+        state <= W12_MULTIPLY;  //Go to W12 Multiplication
+    end
+	end
+endtask
 
-	if (state == W12_MULTIPLY) begin
+task weights_multiply_w12;
+begin
 
     //Multiply w12  with input test image
     w12_mul_test_img[0]  <= w12_mul_test_img[0] + w12[0][count]*test_img[count];
@@ -211,60 +223,58 @@ always @(posedge clk) begin
     end
 
 	end
-end
+endtask
 
-always @(posedge clk) begin
-
-	if (state == B12_ADDITION) begin
+task bias_add_b12;
+begin
     //Add Biases from B12
-    z2[0] = w12_mul_test_img[0] + b12[0];
-    z2[1] = w12_mul_test_img[1] + b12[1];
-    z2[2] = w12_mul_test_img[2] + b12[2];
-    z2[3] = w12_mul_test_img[3] + b12[3];
-    z2[4] = w12_mul_test_img[4] + b12[4];
-    z2[5] = w12_mul_test_img[5] + b12[5];
-    z2[6] = w12_mul_test_img[6] + b12[6];
-    z2[7] = w12_mul_test_img[7] + b12[7];
-    z2[8] = w12_mul_test_img[8] + b12[8];
-    z2[9] = w12_mul_test_img[9] + b12[9];
-    z2[10] = w12_mul_test_img[10] + b12[10];
-    z2[11] = w12_mul_test_img[11] + b12[11];
-    z2[12] = w12_mul_test_img[12] + b12[12];
-    z2[13] = w12_mul_test_img[13] + b12[13];
-    z2[14] = w12_mul_test_img[14] + b12[14];
-    z2[15] = w12_mul_test_img[15] + b12[15];
-    z2[16] = w12_mul_test_img[16] + b12[16];
-    z2[17] = w12_mul_test_img[17] + b12[17];
-    z2[18] = w12_mul_test_img[18] + b12[18];
-    z2[19] = w12_mul_test_img[19] + b12[19];
-    z2[20] = w12_mul_test_img[20] + b12[20];
-    z2[21] = w12_mul_test_img[21] + b12[21];
-    z2[22] = w12_mul_test_img[22] + b12[22];
-    z2[23] = w12_mul_test_img[23] + b12[23];
-    z2[24] = w12_mul_test_img[24] + b12[24];
-    z2[25] = w12_mul_test_img[25] + b12[25];
-    z2[26] = w12_mul_test_img[26] + b12[26];
-    z2[27] = w12_mul_test_img[27] + b12[27];
-    z2[28] = w12_mul_test_img[28] + b12[28];
-    z2[29] = w12_mul_test_img[29] + b12[29];
-    z2[30] = w12_mul_test_img[30] + b12[30];
-    z2[31] = w12_mul_test_img[31] + b12[31];
-    z2[32] = w12_mul_test_img[32] + b12[32];
-    z2[33] = w12_mul_test_img[33] + b12[33];
-    z2[34] = w12_mul_test_img[34] + b12[34];
-    z2[35] = w12_mul_test_img[35] + b12[35];
-    z2[36] = w12_mul_test_img[36] + b12[36];
-    z2[37] = w12_mul_test_img[37] + b12[37];
-    z2[38] = w12_mul_test_img[38] + b12[38];
-    z2[39] = w12_mul_test_img[39] + b12[39];
+    z2[0] <= w12_mul_test_img[0] + b12[0];
+    z2[1] <= w12_mul_test_img[1] + b12[1];
+    z2[2] <= w12_mul_test_img[2] + b12[2];
+    z2[3] <= w12_mul_test_img[3] + b12[3];
+    z2[4] <= w12_mul_test_img[4] + b12[4];
+    z2[5] <= w12_mul_test_img[5] + b12[5];
+    z2[6] <= w12_mul_test_img[6] + b12[6];
+    z2[7] <= w12_mul_test_img[7] + b12[7];
+    z2[8] <= w12_mul_test_img[8] + b12[8];
+    z2[9] <= w12_mul_test_img[9] + b12[9];
+    z2[10] <= w12_mul_test_img[10] + b12[10];
+    z2[11] <= w12_mul_test_img[11] + b12[11];
+    z2[12] <= w12_mul_test_img[12] + b12[12];
+    z2[13] <= w12_mul_test_img[13] + b12[13];
+    z2[14] <= w12_mul_test_img[14] + b12[14];
+    z2[15] <= w12_mul_test_img[15] + b12[15];
+    z2[16] <= w12_mul_test_img[16] + b12[16];
+    z2[17] <= w12_mul_test_img[17] + b12[17];
+    z2[18] <= w12_mul_test_img[18] + b12[18];
+    z2[19] <= w12_mul_test_img[19] + b12[19];
+    z2[20] <= w12_mul_test_img[20] + b12[20];
+    z2[21] <= w12_mul_test_img[21] + b12[21];
+    z2[22] <= w12_mul_test_img[22] + b12[22];
+    z2[23] <= w12_mul_test_img[23] + b12[23];
+    z2[24] <= w12_mul_test_img[24] + b12[24];
+    z2[25] <= w12_mul_test_img[25] + b12[25];
+    z2[26] <= w12_mul_test_img[26] + b12[26];
+    z2[27] <= w12_mul_test_img[27] + b12[27];
+    z2[28] <= w12_mul_test_img[28] + b12[28];
+    z2[29] <= w12_mul_test_img[29] + b12[29];
+    z2[30] <= w12_mul_test_img[30] + b12[30];
+    z2[31] <= w12_mul_test_img[31] + b12[31];
+    z2[32] <= w12_mul_test_img[32] + b12[32];
+    z2[33] <= w12_mul_test_img[33] + b12[33];
+    z2[34] <= w12_mul_test_img[34] + b12[34];
+    z2[35] <= w12_mul_test_img[35] + b12[35];
+    z2[36] <= w12_mul_test_img[36] + b12[36];
+    z2[37] <= w12_mul_test_img[37] + b12[37];
+    z2[38] <= w12_mul_test_img[38] + b12[38];
+    z2[39] <= w12_mul_test_img[39] + b12[39];
 
-    state = RELU_STAGE1; //B12 addition done. Now, go to RELU state
+    state <= RELU_STAGE1; //B12 addition done. Now, go to RELU state
     end
-end
+endtask
 
-always @(posedge clk) begin
-
-	if (state == RELU_STAGE1) begin
+task relu_stage1;
+begin
     //LEAKY RELU
     if (z2[count]>0) begin
         a2[count] <= z2[count] * $signed(relu_multiply_1);   //Multiply by 1
@@ -279,11 +289,10 @@ always @(posedge clk) begin
         state <= W23_MULTIPLY; //RELU done. Now, go to prediction state
     end    
 	end
-end
+endtask
 
-always @(posedge clk) begin
-
-	if (state == W23_MULTIPLY) begin
+task weights_multiply_w23;
+begin
 
     //Multiply w23  a2
     w23_mul_a2[0]  <= w23_mul_a2[0] + w23[0][count]*a2[count];
@@ -304,31 +313,29 @@ always @(posedge clk) begin
     end    
 
 	end
-end
+endtask
 
-always @(posedge clk) begin
-
-	if (state == B23_ADDITION) begin
+task bias_add_b23;
+begin
     //Add Biases from B23
-    z3[0] = w23_mul_a2[0] + b23_shifted[0];
-    z3[1] = w23_mul_a2[1] + b23_shifted[1];
-    z3[2] = w23_mul_a2[2] + b23_shifted[2];
-    z3[3] = w23_mul_a2[3] + b23_shifted[3];
-    z3[4] = w23_mul_a2[4] + b23_shifted[4];
-    z3[5] = w23_mul_a2[5] + b23_shifted[5];
-    z3[6] = w23_mul_a2[6] + b23_shifted[6];
-    z3[7] = w23_mul_a2[7] + b23_shifted[7];
-    z3[8] = w23_mul_a2[8] + b23_shifted[8];
-    z3[9] = w23_mul_a2[9] + b23_shifted[9];
+    z3[0] <= w23_mul_a2[0] + b23_shifted[0];
+    z3[1] <= w23_mul_a2[1] + b23_shifted[1];
+    z3[2] <= w23_mul_a2[2] + b23_shifted[2];
+    z3[3] <= w23_mul_a2[3] + b23_shifted[3];
+    z3[4] <= w23_mul_a2[4] + b23_shifted[4];
+    z3[5] <= w23_mul_a2[5] + b23_shifted[5];
+    z3[6] <= w23_mul_a2[6] + b23_shifted[6];
+    z3[7] <= w23_mul_a2[7] + b23_shifted[7];
+    z3[8] <= w23_mul_a2[8] + b23_shifted[8];
+    z3[9] <= w23_mul_a2[9] + b23_shifted[9];
 
-    state = RELU_STAGE2; //B23 addition done. Now, go to RELU state
-    count = 0;
+    state <= RELU_STAGE2; //B23 addition done. Now, go to RELU state
+    count <= 0;
 	end
-end
+endtask
 
-always @(posedge clk) begin
-
-	if (state == RELU_STAGE2) begin
+task relu_stage2;
+begin
     //LEAKY RELU
     if (z3[count]>0) begin
         a3[count] <= z3[count] * $signed(relu_multiply_1);  //Multiply by 1
@@ -343,11 +350,10 @@ always @(posedge clk) begin
         state <= PREDICTION; //RELU done. Now, go to prediction state
     end    
 end
-end
+endtask
 
-always @(posedge clk) begin
-
-	if (state == PREDICTION) begin
+task predict_img_value;
+begin
    //Find the MAX 
     if (a3[count] >= max_a3) begin
         max_a3 <= a3[count];
@@ -358,20 +364,19 @@ always @(posedge clk) begin
     if ( count == 9 ) begin
         count <= 0;
         predicted_val <= max_index;
-	done = 1;
+	done <= 1;
         state <= FINISHED; //MAX find done. Now, go to FINISHED state
     end   
     end
-end
+endtask
 
-always @(posedge clk) begin
+task finished;
+begin
 
-	if (state == FINISHED) begin
-
-    state = IDLE;
+    state <= IDLE;
     
-end
-end
+	end
+endtask
 
 
 
