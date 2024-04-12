@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2,885 ps"></ZoomStartTime>
-      <ZoomEndTime time="3,434 ps"></ZoomEndTime>
-      <Cursor1Time time="5,000 ps"></Cursor1Time>
+      <ZoomStartTime time="507.256 ns"></ZoomStartTime>
+      <ZoomEndTime time="770.949 ns"></ZoomEndTime>
+      <Cursor1Time time="727.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="227"></NameColumnWidth>
+      <NameColumnWidth column_width="239"></NameColumnWidth>
       <ValueColumnWidth column_width="380"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="34" />
+   <WVObjectSize size="21" />
    <wvobject fp_name="/tb_neural_nw_inference/tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -44,6 +44,18 @@
       <obj_property name="ElementShortName">predicted_val[0:3]</obj_property>
       <obj_property name="ObjectShortName">predicted_val[0:3]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/tb/count" type="array">
+      <obj_property name="ElementShortName">count[31:0]</obj_property>
+      <obj_property name="ObjectShortName">count[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/tb/state" type="array">
+      <obj_property name="ElementShortName">state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_neural_nw_inference/tb/next_state" type="array">
+      <obj_property name="ElementShortName">next_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">next_state[3:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_neural_nw_inference/tb/b12" type="array">
       <obj_property name="ElementShortName">b12[0:39][0:15]</obj_property>
       <obj_property name="ObjectShortName">b12[0:39][0:15]</obj_property>
@@ -56,214 +68,14 @@
       <obj_property name="ElementShortName">b23[0:9][0:15]</obj_property>
       <obj_property name="ObjectShortName">b23[0:9][0:15]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/state" type="array">
-      <obj_property name="ElementShortName">state[0:3]</obj_property>
-      <obj_property name="ObjectShortName">state[0:3]</obj_property>
+   <wvobject fp_name="/tb_neural_nw_inference/tb/b23_shifted" type="array">
+      <obj_property name="ElementShortName">b23_shifted[0:9][0:49]</obj_property>
+      <obj_property name="ObjectShortName">b23_shifted[0:9][0:49]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img" type="array">
       <obj_property name="ElementShortName">w12_mul_test_img[0:39][0:16]</obj_property>
       <obj_property name="ObjectShortName">w12_mul_test_img[0:39][0:16]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[0]" type="array">
-         <obj_property name="ElementShortName">[0][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[0][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[1]" type="array">
-         <obj_property name="ElementShortName">[1][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[1][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[2]" type="array">
-         <obj_property name="ElementShortName">[2][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[2][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[3]" type="array">
-         <obj_property name="ElementShortName">[3][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[3][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[4]" type="array">
-         <obj_property name="ElementShortName">[4][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[4][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[5]" type="array">
-         <obj_property name="ElementShortName">[5][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[5][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[6]" type="array">
-         <obj_property name="ElementShortName">[6][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[6][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[7]" type="array">
-         <obj_property name="ElementShortName">[7][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[7][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[8]" type="array">
-         <obj_property name="ElementShortName">[8][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[8][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[9]" type="array">
-         <obj_property name="ElementShortName">[9][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[9][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[10]" type="array">
-         <obj_property name="ElementShortName">[10][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[10][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[11]" type="array">
-         <obj_property name="ElementShortName">[11][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[11][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[12]" type="array">
-         <obj_property name="ElementShortName">[12][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[12][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[13]" type="array">
-         <obj_property name="ElementShortName">[13][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[13][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[14]" type="array">
-         <obj_property name="ElementShortName">[14][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[14][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[15]" type="array">
-         <obj_property name="ElementShortName">[15][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[15][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[16]" type="array">
-         <obj_property name="ElementShortName">[16][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[16][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[17]" type="array">
-         <obj_property name="ElementShortName">[17][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[17][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[18]" type="array">
-         <obj_property name="ElementShortName">[18][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[18][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[19]" type="array">
-         <obj_property name="ElementShortName">[19][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[19][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[20]" type="array">
-         <obj_property name="ElementShortName">[20][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[20][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[21]" type="array">
-         <obj_property name="ElementShortName">[21][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[21][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[22]" type="array">
-         <obj_property name="ElementShortName">[22][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[22][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[23]" type="array">
-         <obj_property name="ElementShortName">[23][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[23][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[24]" type="array">
-         <obj_property name="ElementShortName">[24][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[24][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[25]" type="array">
-         <obj_property name="ElementShortName">[25][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[25][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[26]" type="array">
-         <obj_property name="ElementShortName">[26][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[26][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[27]" type="array">
-         <obj_property name="ElementShortName">[27][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[27][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[28]" type="array">
-         <obj_property name="ElementShortName">[28][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[28][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[29]" type="array">
-         <obj_property name="ElementShortName">[29][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[29][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[30]" type="array">
-         <obj_property name="ElementShortName">[30][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[30][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[31]" type="array">
-         <obj_property name="ElementShortName">[31][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[31][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[32]" type="array">
-         <obj_property name="ElementShortName">[32][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[32][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[33]" type="array">
-         <obj_property name="ElementShortName">[33][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[33][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[34]" type="array">
-         <obj_property name="ElementShortName">[34][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[34][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[35]" type="array">
-         <obj_property name="ElementShortName">[35][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[35][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[36]" type="array">
-         <obj_property name="ElementShortName">[36][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[36][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[37]" type="array">
-         <obj_property name="ElementShortName">[37][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[37][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[38]" type="array">
-         <obj_property name="ElementShortName">[38][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[38][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_neural_nw_inference/tb/w12_mul_test_img[39]" type="array">
-         <obj_property name="ElementShortName">[39][0:16]</obj_property>
-         <obj_property name="ObjectShortName">[39][0:16]</obj_property>
-         <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject fp_name="/tb_neural_nw_inference/tb/z2" type="array">
       <obj_property name="ElementShortName">z2[0:39][0:16]</obj_property>
@@ -277,10 +89,6 @@
       <obj_property name="ElementShortName">w23_mul_a2[0:9][0:48]</obj_property>
       <obj_property name="ObjectShortName">w23_mul_a2[0:9][0:48]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/b23_shifted" type="array">
-      <obj_property name="ElementShortName">b23_shifted[0:9][0:48]</obj_property>
-      <obj_property name="ObjectShortName">b23_shifted[0:9][0:48]</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_neural_nw_inference/tb/z3" type="array">
       <obj_property name="ElementShortName">z3[0:9][0:48]</obj_property>
       <obj_property name="ObjectShortName">z3[0:9][0:48]</obj_property>
@@ -288,10 +96,7 @@
    <wvobject fp_name="/tb_neural_nw_inference/tb/a3" type="array">
       <obj_property name="ElementShortName">a3[0:9][0:64]</obj_property>
       <obj_property name="ObjectShortName">a3[0:9][0:64]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/count" type="array">
-      <obj_property name="ElementShortName">count[31:0]</obj_property>
-      <obj_property name="ObjectShortName">count[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_neural_nw_inference/tb/max_a3" type="array">
       <obj_property name="ElementShortName">max_a3[0:64]</obj_property>
@@ -300,61 +105,5 @@
    <wvobject fp_name="/tb_neural_nw_inference/tb/max_index" type="array">
       <obj_property name="ElementShortName">max_index[0:3]</obj_property>
       <obj_property name="ObjectShortName">max_index[0:3]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/INP_IMG_PIXELS" type="array">
-      <obj_property name="ElementShortName">INP_IMG_PIXELS[8:0]</obj_property>
-      <obj_property name="ObjectShortName">INP_IMG_PIXELS[8:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/HIDDEN_NODES" type="array">
-      <obj_property name="ElementShortName">HIDDEN_NODES[7:0]</obj_property>
-      <obj_property name="ObjectShortName">HIDDEN_NODES[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/OUTP_NODES" type="array">
-      <obj_property name="ElementShortName">OUTP_NODES[7:0]</obj_property>
-      <obj_property name="ObjectShortName">OUTP_NODES[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/relu_multiply_1" type="array">
-      <obj_property name="ElementShortName">relu_multiply_1[15:0]</obj_property>
-      <obj_property name="ObjectShortName">relu_multiply_1[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/relu_multiply_slope" type="array">
-      <obj_property name="ElementShortName">relu_multiply_slope[15:0]</obj_property>
-      <obj_property name="ObjectShortName">relu_multiply_slope[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/IDLE" type="array">
-      <obj_property name="ElementShortName">IDLE[3:0]</obj_property>
-      <obj_property name="ObjectShortName">IDLE[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/W12_MULTIPLY" type="array">
-      <obj_property name="ElementShortName">W12_MULTIPLY[3:0]</obj_property>
-      <obj_property name="ObjectShortName">W12_MULTIPLY[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/B12_ADDITION" type="array">
-      <obj_property name="ElementShortName">B12_ADDITION[3:0]</obj_property>
-      <obj_property name="ObjectShortName">B12_ADDITION[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/RELU_STAGE1" type="array">
-      <obj_property name="ElementShortName">RELU_STAGE1[3:0]</obj_property>
-      <obj_property name="ObjectShortName">RELU_STAGE1[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/W23_MULTIPLY" type="array">
-      <obj_property name="ElementShortName">W23_MULTIPLY[3:0]</obj_property>
-      <obj_property name="ObjectShortName">W23_MULTIPLY[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/B23_ADDITION" type="array">
-      <obj_property name="ElementShortName">B23_ADDITION[3:0]</obj_property>
-      <obj_property name="ObjectShortName">B23_ADDITION[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/RELU_STAGE2" type="array">
-      <obj_property name="ElementShortName">RELU_STAGE2[3:0]</obj_property>
-      <obj_property name="ObjectShortName">RELU_STAGE2[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/PREDICTION" type="array">
-      <obj_property name="ElementShortName">PREDICTION[3:0]</obj_property>
-      <obj_property name="ObjectShortName">PREDICTION[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_neural_nw_inference/tb/FINISHED" type="array">
-      <obj_property name="ElementShortName">FINISHED[3:0]</obj_property>
-      <obj_property name="ObjectShortName">FINISHED[3:0]</obj_property>
    </wvobject>
 </wave_config>
