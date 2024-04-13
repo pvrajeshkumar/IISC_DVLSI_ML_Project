@@ -81,11 +81,11 @@ parameter FINISHED      =   4'b1000;
 reg [3:0] state, next_state;
 
 
-always @(posedge clk or posedge rst) begin
+always @(posedge clk ) begin
     if( rst )
-        state = IDLE;
+        state <= IDLE;
     else
-        state = next_state; 
+        state <= next_state; 
 end
 
 always @(posedge clk) begin
