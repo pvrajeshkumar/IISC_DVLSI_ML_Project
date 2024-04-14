@@ -33,6 +33,10 @@ parameter INP_IMG_PIXELS      =   9'd256;
 parameter HIDDEN_NODES        =   8'd40;
 parameter OUTP_NODES          =   8'd10;
 
+//RELU Parameters from MATLAB test output
+parameter relu_multiply_1 = 16'd256;
+parameter relu_multiply_slope = 16'd12;
+
 //Weights, Biases Matrix sizes based on Hidden Nodes, Output Nodes
 //				       [h x pix ]   [pix x 1]
 //z2 = w12 x a1 ====== [40 x 256] * [256 x 1]   ===== [40 x 1]
@@ -46,326 +50,557 @@ wire signed [0:15] b12 [0:39];
 wire signed [0:15] w23 [0:9][0:39];
 wire signed [0:15] b23 [0:9];
 
+
 //Intermediate compute variables
 //Input side
-reg signed [0:16] w12_mul_test_img[0:39];                   //[MATLAB]: z2_interim = w12_fix_int * a1; % (Q16.8 * Q1.0 = Q17.8).
-reg signed [0:16] z2[0:39];     //w12_mul_test_img+b12      //[MATLAB]: z2 = z2_interim + b12_fix_int; % Q17.8 + Q16.8 = Q17.8
-reg signed [0:32] a2[0:39];                                 //[MATLAB]: a2 = leaky_relu_fixp(z2);  % Q16.8 * Q17.8 = Q33.16
+reg signed [0:16] w12_mul_test_img [0:39];
+reg signed [0:16] z2 [0:39];     //w12_mul_test_img+b12      //[MATLAB]: z2 = z2_interim + b12_fix_int; % Q17.8 + Q16.8 = Q17.8
+reg signed [0:32] a2 [0:39];                                 //[MATLAB]: a2 = leaky_relu_fixp(z2);  % Q16.8 * Q17.8 = Q33.16
 
 //Output side
-reg signed [0:48] w23_mul_a2[0:9];                          //[MATLAB]: z3_interim = w23_fix_int * a2; % (Q16.8 * Q33.16 = Q49.24).
-wire signed [0:49] b23_shifted[0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %Shift by 16 bits o convert to Q.24 format
-reg signed [0:48] z3[0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q49.24 + Q32.24 = Q49.24
-reg signed [0:64] a3[0:9];                                  //[MATLAB]: a3 = leaky_relu_fixp(z3);  % Q49.24 * Q16.8 = Q65.32
-
-//RELU Parameters from MATLAB test output
-parameter relu_multiply_1 = 16'd256;
-parameter relu_multiply_slope = 16'd12;
-
-reg [0:16] count;//, relu1_count, w23mul_count, relu2_count, predict_count;  //loop counters
+reg signed [0:48] w23_mul_a2 [0:9];                          //[MATLAB]: z3_interim = w23_fix_int * a2; % (Q16.8 * Q33.16 = Q49.24).
+wire signed [0:49] b23_shifted [0:9];                         //[MATLAB]: b23_fix_int_interim = b23_fix_int * 2^16; %Shift by 16 bits o convert to Q.24 format
+reg signed [0:48] z3 [0:9];     //w23_mul_a2+b23_shifted     //[MATLAB]:  z3 = z3_interim + b23_fix_int_interim;  % Q49.24 + Q32.24 = Q49.24
+reg signed [0:64] a3 [0:9];		//Output nodes for prediction
 reg signed [0:64] max_a3;
-reg signed [0:3] max_index;
-
+reg signed [0:3]  max_index;
 
 // States of the operations
-parameter IDLE          =   4'b0000;
-parameter W12_MULTIPLY  =   4'b0001;
-parameter B12_ADDITION  =   4'b0010;
-parameter RELU_STAGE1   =   4'b0011;
-parameter W23_MULTIPLY  =   4'b0100;
-parameter B23_ADDITION  =   4'b0101;
-parameter RELU_STAGE2   =   4'b0110;
-parameter PREDICTION    =   4'b0111;
-parameter FINISHED      =   4'b1000;
+parameter START         =   4'b0000;
+parameter RESET         =   4'b0001;
+parameter W12_MULTIPLY  =   4'b0010;
+parameter B12_ADDITION  =   4'b0011;
+parameter RELU_STAGE1   =   4'b0100;
+parameter W23_MULTIPLY  =   4'b0101;
+parameter B23_ADDITION  =   4'b0110;
+parameter RELU_STAGE2   =   4'b0111;
+parameter PREDICTION    =   4'b1000;
+parameter FINISHED      =   4'b1001;
 
-reg [3:0] state, next_state;
+//State machine procesing variables
+reg [0:3] state;
+reg rst_on_start;
+reg do_w12_mul_test_img;
+reg do_add_b12;
+reg do_RELU_1;
+reg do_w23_mul_a2;
+reg do_add_b23;
+reg do_RELU_2;
+reg do_find_max;
+reg [0:7] count;
 
 
-always @(posedge clk ) begin
-    if( rst )
-        state <= IDLE;
+// FSM Control Unit
+always@(posedge clk)
+begin
+    if(rst == 1)
+        begin
+            predicted_val <= 4'b0;
+            state <= START;
+        end
     else
-        state <= next_state; 
+        begin
+                case(state)
+                START: // Wait for start
+                    begin    
+                        do_w12_mul_test_img  <= 1'b0;
+                        do_add_b12  <= 1'b0;
+                        do_RELU_1 <= 1'b0;
+                        do_w23_mul_a2  <= 1'b0;
+                        do_add_b23  <= 1'b0;
+                        do_RELU_2 <= 1'b0;
+                        do_find_max    <= 1'b0;
+                        done   <= 1'b0; 
+
+                        if(start == 0)
+                            begin
+                                rst_on_start   <= 1'b0;
+                                state <= START;
+                                count <= 8'b0;
+                            end
+                        else
+                            begin
+                                state <= RESET; 
+                                rst_on_start   <= 1'b1;
+                            end
+                    end
+                RESET: // reset state machine variables & go to MUL with Input test image
+                    begin
+                        state <= W12_MULTIPLY;
+                        rst_on_start   <= 1'b0;
+                        do_w12_mul_test_img <= 1'b1;   
+                    end
+                W12_MULTIPLY: // do MUL with Input test image & nce done, got o B12 Addition state
+                    begin
+                        if(count == 255)
+                            begin
+                                state <= B12_ADDITION;
+                                count <= 8'b0;
+                                do_w12_mul_test_img <= 1'b0;
+                                do_add_b12 <= 1'b1;
+                            end
+                        else
+                            begin
+                                state <= W12_MULTIPLY;
+                                count <= count + 1'b1;
+                            end 
+                    end  
+                B12_ADDITION: // do B12 biases addition & go to RELU1 
+                    begin
+                        do_add_b12 <= 1'b0;
+                        state <= RELU_STAGE1;
+                        do_RELU_1 <= 1'b1;
+                    end
+                RELU_STAGE1: // do RELU_1 & once done, go to MUL2 state
+                    begin
+                        if(count == 39)
+                            begin
+                                state <= W23_MULTIPLY;
+                                count <= 8'b0;
+                                do_RELU_1 <= 1'b0;
+                                do_w23_mul_a2 <= 1'b1;
+                            end
+                        else
+                            begin
+                                state <= RELU_STAGE1;
+                                count <= count + 1'b1;
+                            end
+                    end          
+                W23_MULTIPLY: // do w23 MUL & once done go to B23 biases addition state
+                    begin
+                        if(count == 39)
+                            begin
+                                state <= B23_ADDITION;
+                                do_w23_mul_a2 <= 1'b0;
+                                do_add_b23 <= 1'b1;
+                                count <= 8'b0;
+                            end
+                        else
+                            begin
+                                state <= W23_MULTIPLY;
+                                count <= count + 1'b1;
+                            end                
+                    end         
+                B23_ADDITION: // do B23 biases addition & once done, go to RELU2
+                    begin
+                        do_add_b23 <= 1'b0;
+                        do_RELU_2 <= 1'b1;
+                        state <= RELU_STAGE2;
+                    end
+                RELU_STAGE2: // do RELU2 & once done, go to PREDICTION
+                    begin
+                        if(count == 9)
+                            begin
+                                do_RELU_2 <= 1'b0;
+                                do_find_max <= 1'b1;
+                                state <= PREDICTION;
+                                count <= 8'b0;
+                            end
+                        else
+                            begin
+                                state <= RELU_STAGE2;
+                                count <= count + 1'b1;
+                            end
+                    end    
+                PREDICTION: // do PREDICTION by finding MAX valu
+                    begin
+                        if(count == 8)
+                            begin
+                                state <= FINISHED;
+                                do_find_max <= 1'b0;
+                                count <= 8'b0;
+                            end
+                        else
+                            begin
+                                state <= PREDICTION;
+                                count <= count + 1'b1;
+                            end
+                    end
+                FINISHED: // done state
+                    begin
+                        state <= START;
+                        done <= 1'b1;
+                        predicted_val <= max_index;
+                    end 
+                default:
+                    begin
+                    state     <= START;  
+                    do_w12_mul_test_img  <= 1'b0;
+                    do_add_b12  <= 1'b0;
+                    do_RELU_1 <= 1'b0;
+                    do_w23_mul_a2  <= 1'b0;
+                    do_add_b23  <= 1'b0;
+                    do_RELU_2 <= 1'b0;
+                    do_find_max    <= 1'b0;
+                    done   <= 1'b0;
+                    count  <= 8'b0;
+                    predicted_val <= 4'b0;
+                    rst_on_start   <= 1'b0;
+                    end                       
+            endcase  
+        end   
 end
 
-always @(posedge clk) begin
-
-    if (rst) begin
-        done = 1'b0; //Set the done to ZERO upon beginning
-        predicted_val =1'b0;
+//Each State processing goes below
+// W12_MULTIPLY
+always@(posedge clk)
+begin
+    if(rst_on_start == 1)
+    begin
+        w12_mul_test_img[0] <= 17'd0;
+        w12_mul_test_img[1] <= 17'd0;
+        w12_mul_test_img[2] <= 17'd0;
+        w12_mul_test_img[3] <= 17'd0;
+        w12_mul_test_img[4] <= 17'd0;
+        w12_mul_test_img[5] <= 17'd0;
+        w12_mul_test_img[6] <= 17'd0;
+        w12_mul_test_img[7] <= 17'd0;
+        w12_mul_test_img[8] <= 17'd0;
+        w12_mul_test_img[9] <= 17'd0;
+        w12_mul_test_img[10] <= 17'd0;
+        w12_mul_test_img[11] <= 17'd0;
+        w12_mul_test_img[12] <= 17'd0;
+        w12_mul_test_img[13] <= 17'd0;
+        w12_mul_test_img[14] <= 17'd0;
+        w12_mul_test_img[15] <= 17'd0;
+        w12_mul_test_img[16] <= 17'd0;
+        w12_mul_test_img[17] <= 17'd0;
+        w12_mul_test_img[18] <= 17'd0;
+        w12_mul_test_img[19] <= 17'd0;
+        w12_mul_test_img[20] <= 17'd0;
+        w12_mul_test_img[21] <= 17'd0;
+        w12_mul_test_img[22] <= 17'd0;
+        w12_mul_test_img[23] <= 17'd0;
+        w12_mul_test_img[24] <= 17'd0;
+        w12_mul_test_img[25] <= 17'd0;
+        w12_mul_test_img[26] <= 17'd0;
+        w12_mul_test_img[27] <= 17'd0;
+        w12_mul_test_img[28] <= 17'd0;
+        w12_mul_test_img[29] <= 17'd0;
+        w12_mul_test_img[29] <= 17'd0;
+        w12_mul_test_img[30] <= 17'd0;
+        w12_mul_test_img[31] <= 17'd0;
+        w12_mul_test_img[32] <= 17'd0;
+        w12_mul_test_img[33] <= 17'd0;
+        w12_mul_test_img[34] <= 17'd0;
+        w12_mul_test_img[35] <= 17'd0;
+        w12_mul_test_img[36] <= 17'd0;
+        w12_mul_test_img[37] <= 17'd0;
+        w12_mul_test_img[38] <= 17'd0;
+        w12_mul_test_img[39] <= 17'd0;
     end
-    else begin
-        case (state)
+    else if(do_w12_mul_test_img == 1)
+    begin
+        w12_mul_test_img[0] <= w12_mul_test_img[0] + w12[0][count]*test_img[count];
+        w12_mul_test_img[1] <= w12_mul_test_img[1] + w12[1][count]*test_img[count];
+        w12_mul_test_img[2] <= w12_mul_test_img[2] + w12[2][count]*test_img[count];
+        w12_mul_test_img[3] <= w12_mul_test_img[3] + w12[3][count]*test_img[count];
+        w12_mul_test_img[4] <= w12_mul_test_img[4] + w12[4][count]*test_img[count];
+        w12_mul_test_img[5] <= w12_mul_test_img[5] + w12[5][count]*test_img[count];
+        w12_mul_test_img[6] <= w12_mul_test_img[6] + w12[6][count]*test_img[count];
+        w12_mul_test_img[7] <= w12_mul_test_img[7] + w12[7][count]*test_img[count];
+        w12_mul_test_img[8] <= w12_mul_test_img[8] + w12[8][count]*test_img[count];
+        w12_mul_test_img[9] <= w12_mul_test_img[9] + w12[9][count]*test_img[count];
+        w12_mul_test_img[10] <= w12_mul_test_img[10] + w12[10][count]*test_img[count];
+        w12_mul_test_img[11] <= w12_mul_test_img[11] + w12[11][count]*test_img[count];
+        w12_mul_test_img[12] <= w12_mul_test_img[12] + w12[12][count]*test_img[count];
+        w12_mul_test_img[13] <= w12_mul_test_img[13] + w12[13][count]*test_img[count];
+        w12_mul_test_img[14] <= w12_mul_test_img[14] + w12[14][count]*test_img[count];
+        w12_mul_test_img[15] <= w12_mul_test_img[15] + w12[15][count]*test_img[count];
+        w12_mul_test_img[16] <= w12_mul_test_img[16] + w12[16][count]*test_img[count];
+        w12_mul_test_img[17] <= w12_mul_test_img[17] + w12[17][count]*test_img[count];
+        w12_mul_test_img[18] <= w12_mul_test_img[18] + w12[18][count]*test_img[count];
+        w12_mul_test_img[19] <= w12_mul_test_img[19] + w12[19][count]*test_img[count];
+        w12_mul_test_img[20] <= w12_mul_test_img[20] + w12[20][count]*test_img[count];
+        w12_mul_test_img[21] <= w12_mul_test_img[21] + w12[21][count]*test_img[count];
+        w12_mul_test_img[22] <= w12_mul_test_img[22] + w12[22][count]*test_img[count];
+        w12_mul_test_img[23] <= w12_mul_test_img[23] + w12[23][count]*test_img[count];
+        w12_mul_test_img[24] <= w12_mul_test_img[24] + w12[24][count]*test_img[count];
+        w12_mul_test_img[25] <= w12_mul_test_img[25] + w12[25][count]*test_img[count];
+        w12_mul_test_img[26] <= w12_mul_test_img[26] + w12[26][count]*test_img[count];
+        w12_mul_test_img[27] <= w12_mul_test_img[27] + w12[27][count]*test_img[count];
+        w12_mul_test_img[28] <= w12_mul_test_img[28] + w12[28][count]*test_img[count];
+        w12_mul_test_img[29] <= w12_mul_test_img[29] + w12[29][count]*test_img[count];
+        w12_mul_test_img[30] <= w12_mul_test_img[30] + w12[30][count]*test_img[count];
+        w12_mul_test_img[31] <= w12_mul_test_img[31] + w12[31][count]*test_img[count];
+        w12_mul_test_img[32] <= w12_mul_test_img[32] + w12[32][count]*test_img[count];
+        w12_mul_test_img[33] <= w12_mul_test_img[33] + w12[33][count]*test_img[count];
+        w12_mul_test_img[34] <= w12_mul_test_img[34] + w12[34][count]*test_img[count];
+        w12_mul_test_img[35] <= w12_mul_test_img[35] + w12[35][count]*test_img[count];
+        w12_mul_test_img[36] <= w12_mul_test_img[36] + w12[36][count]*test_img[count];
+        w12_mul_test_img[37] <= w12_mul_test_img[37] + w12[37][count]*test_img[count];
+        w12_mul_test_img[38] <= w12_mul_test_img[38] + w12[38][count]*test_img[count];
+        w12_mul_test_img[39] <= w12_mul_test_img[39] + w12[39][count]*test_img[count];
         
-            IDLE: begin
-                if (start) begin
-                    //Initialize all variables being used
-                    //Input side initialization               
-                    w12_mul_test_img[0]  = 0;  z2[0]  = 0;  a2[0]  = 0;
-                    w12_mul_test_img[1]  = 0;  z2[1]  = 0;  a2[1]  = 0;
-                    w12_mul_test_img[2]  = 0;  z2[2]  = 0;  a2[2]  = 0;
-                    w12_mul_test_img[3]  = 0;  z2[3]  = 0;  a2[3]  = 0;
-                    w12_mul_test_img[4]  = 0;  z2[4]  = 0;  a2[4]  = 0;
-                    w12_mul_test_img[5]  = 0;  z2[5]  = 0;  a2[5]  = 0;
-                    w12_mul_test_img[6]  = 0;  z2[6]  = 0;  a2[6]  = 0;
-                    w12_mul_test_img[7]  = 0;  z2[7]  = 0;  a2[7]  = 0;
-                    w12_mul_test_img[8]  = 0;  z2[8]  = 0;  a2[8]  = 0;
-                    w12_mul_test_img[9]  = 0;  z2[9]  = 0;  a2[9]  = 0;
-                    w12_mul_test_img[10] = 0;  z2[10] = 0;  a2[10] = 0;
-                    w12_mul_test_img[11] = 0;  z2[11] = 0;  a2[11] = 0;
-                    w12_mul_test_img[12] = 0;  z2[12] = 0;  a2[12] = 0;
-                    w12_mul_test_img[13] = 0;  z2[13] = 0;  a2[13] = 0;
-                    w12_mul_test_img[14] = 0;  z2[14] = 0;  a2[14] = 0;
-                    w12_mul_test_img[15] = 0;  z2[15] = 0;  a2[15] = 0;
-                    w12_mul_test_img[16] = 0;  z2[16] = 0;  a2[16] = 0;
-                    w12_mul_test_img[17] = 0;  z2[17] = 0;  a2[17] = 0;
-                    w12_mul_test_img[18] = 0;  z2[18] = 0;  a2[18] = 0;
-                    w12_mul_test_img[19] = 0;  z2[19] = 0;  a2[19] = 0;
-                    w12_mul_test_img[20] = 0;  z2[20] = 0;  a2[20] = 0;
-                    w12_mul_test_img[21] = 0;  z2[21] = 0;  a2[21] = 0;
-                    w12_mul_test_img[22] = 0;  z2[22] = 0;  a2[22] = 0;
-                    w12_mul_test_img[23] = 0;  z2[23] = 0;  a2[23] = 0;
-                    w12_mul_test_img[24] = 0;  z2[24] = 0;  a2[24] = 0;
-                    w12_mul_test_img[25] = 0;  z2[25] = 0;  a2[25] = 0;
-                    w12_mul_test_img[26] = 0;  z2[26] = 0;  a2[26] = 0;
-                    w12_mul_test_img[27] = 0;  z2[27] = 0;  a2[27] = 0;
-                    w12_mul_test_img[28] = 0;  z2[28] = 0;  a2[28] = 0;
-                    w12_mul_test_img[29] = 0;  z2[29] = 0;  a2[29] = 0;
-                    w12_mul_test_img[30] = 0;  z2[30] = 0;  a2[30] = 0;
-                    w12_mul_test_img[31] = 0;  z2[31] = 0;  a2[31] = 0;
-                    w12_mul_test_img[32] = 0;  z2[32] = 0;  a2[32] = 0;
-                    w12_mul_test_img[33] = 0;  z2[33] = 0;  a2[33] = 0;
-                    w12_mul_test_img[34] = 0;  z2[34] = 0;  a2[34] = 0;
-                    w12_mul_test_img[35] = 0;  z2[35] = 0;  a2[35] = 0;
-                    w12_mul_test_img[36] = 0;  z2[36] = 0;  a2[36] = 0;
-                    w12_mul_test_img[37] = 0;  z2[37] = 0;  a2[37] = 0;
-                    w12_mul_test_img[38] = 0;  z2[38] = 0;  a2[38] = 0;
-                    w12_mul_test_img[39] = 0;  z2[39] = 0;  a2[39] = 0;
-                    
-                //Output side initialization
-                    w23_mul_a2[0]  = 0;  z3[0]  = 0;  a3[0]  = 0;
-                    w23_mul_a2[1]  = 0;  z3[1]  = 0;  a3[1]  = 0;
-                    w23_mul_a2[2]  = 0;  z3[2]  = 0;  a3[2]  = 0;
-                    w23_mul_a2[3]  = 0;  z3[3]  = 0;  a3[3]  = 0;
-                    w23_mul_a2[4]  = 0;  z3[4]  = 0;  a3[4]  = 0;
-                    w23_mul_a2[5]  = 0;  z3[5]  = 0;  a3[5]  = 0;
-                    w23_mul_a2[6]  = 0;  z3[6]  = 0;  a3[6]  = 0;
-                    w23_mul_a2[7]  = 0;  z3[7]  = 0;  a3[7]  = 0;
-                    w23_mul_a2[8]  = 0;  z3[8]  = 0;  a3[8]  = 0;
-                    w23_mul_a2[9]  = 0;  z3[9]  = 0;  a3[9]  = 0;   
-                    
-                    max_a3 = 0;
-                    max_index = 0;
-                    done = 1'b0;
-                    count = 0;//Initialize counters
-                    next_state = W12_MULTIPLY;  //Go to W12 Multiplication
-                end            
-            end
-            
-            W12_MULTIPLY: begin
-                if ( count == 256 ) begin
-                    count =0;
-                    next_state = B12_ADDITION; //W12 Multiplication done. Now, go to B12_ADDITION
-                end
-                else begin    
-                //Multiply w12  with input test image
-                w12_mul_test_img[0]  = w12_mul_test_img[0] + w12[0][count]*test_img[count];
-                w12_mul_test_img[1]  = w12_mul_test_img[1] + w12[1][count]*test_img[count];
-                w12_mul_test_img[2]  = w12_mul_test_img[2] + w12[2][count]*test_img[count];
-                w12_mul_test_img[3]  = w12_mul_test_img[3] + w12[3][count]*test_img[count];
-                w12_mul_test_img[4]  = w12_mul_test_img[4] + w12[4][count]*test_img[count];
-                w12_mul_test_img[5]  = w12_mul_test_img[5] + w12[5][count]*test_img[count];
-                w12_mul_test_img[6]  = w12_mul_test_img[6] + w12[6][count]*test_img[count];
-                w12_mul_test_img[7]  = w12_mul_test_img[7] + w12[7][count]*test_img[count];
-                w12_mul_test_img[8]  = w12_mul_test_img[8] + w12[8][count]*test_img[count];
-                w12_mul_test_img[9]  = w12_mul_test_img[9] + w12[9][count]*test_img[count];
-                w12_mul_test_img[10] = w12_mul_test_img[10] + w12[10][count]*test_img[count];
-                w12_mul_test_img[11] = w12_mul_test_img[11] + w12[11][count]*test_img[count];
-                w12_mul_test_img[12] = w12_mul_test_img[12] + w12[12][count]*test_img[count];
-                w12_mul_test_img[13] = w12_mul_test_img[13] + w12[13][count]*test_img[count];
-                w12_mul_test_img[14] = w12_mul_test_img[14] + w12[14][count]*test_img[count];
-                w12_mul_test_img[15] = w12_mul_test_img[15] + w12[15][count]*test_img[count];
-                w12_mul_test_img[16] = w12_mul_test_img[16] + w12[16][count]*test_img[count];
-                w12_mul_test_img[17] = w12_mul_test_img[17] + w12[17][count]*test_img[count];
-                w12_mul_test_img[18] = w12_mul_test_img[18] + w12[18][count]*test_img[count];
-                w12_mul_test_img[19] = w12_mul_test_img[19] + w12[19][count]*test_img[count];
-                w12_mul_test_img[20] = w12_mul_test_img[20] + w12[20][count]*test_img[count];
-                w12_mul_test_img[21] = w12_mul_test_img[21] + w12[21][count]*test_img[count];
-                w12_mul_test_img[22] = w12_mul_test_img[22] + w12[22][count]*test_img[count];
-                w12_mul_test_img[23] = w12_mul_test_img[23] + w12[23][count]*test_img[count];
-                w12_mul_test_img[24] = w12_mul_test_img[24] + w12[24][count]*test_img[count];
-                w12_mul_test_img[25] = w12_mul_test_img[25] + w12[25][count]*test_img[count];
-                w12_mul_test_img[26] = w12_mul_test_img[26] + w12[26][count]*test_img[count];
-                w12_mul_test_img[27] = w12_mul_test_img[27] + w12[27][count]*test_img[count];
-                w12_mul_test_img[28] = w12_mul_test_img[28] + w12[28][count]*test_img[count];
-                w12_mul_test_img[29] = w12_mul_test_img[29] + w12[29][count]*test_img[count];
-                w12_mul_test_img[30] = w12_mul_test_img[30] + w12[30][count]*test_img[count];
-                w12_mul_test_img[31] = w12_mul_test_img[31] + w12[31][count]*test_img[count];
-                w12_mul_test_img[32] = w12_mul_test_img[32] + w12[32][count]*test_img[count];
-                w12_mul_test_img[33] = w12_mul_test_img[33] + w12[33][count]*test_img[count];
-                w12_mul_test_img[34] = w12_mul_test_img[34] + w12[34][count]*test_img[count];
-                w12_mul_test_img[35] = w12_mul_test_img[35] + w12[35][count]*test_img[count];
-                w12_mul_test_img[36] = w12_mul_test_img[36] + w12[36][count]*test_img[count];
-                w12_mul_test_img[37] = w12_mul_test_img[37] + w12[37][count]*test_img[count];
-                w12_mul_test_img[38] = w12_mul_test_img[38] + w12[38][count]*test_img[count];
-                w12_mul_test_img[39] = w12_mul_test_img[39] + w12[39][count]*test_img[count];
-                
-                count = count+1;
-                end            
-            end
-            
-            B12_ADDITION: begin
-                //Add Biases from B12
-                z2[0] = w12_mul_test_img[0] + b12[0];
-                z2[1] = w12_mul_test_img[1] + b12[1];
-                z2[2] = w12_mul_test_img[2] + b12[2];
-                z2[3] = w12_mul_test_img[3] + b12[3];
-                z2[4] = w12_mul_test_img[4] + b12[4];
-                z2[5] = w12_mul_test_img[5] + b12[5];
-                z2[6] = w12_mul_test_img[6] + b12[6];
-                z2[7] = w12_mul_test_img[7] + b12[7];
-                z2[8] = w12_mul_test_img[8] + b12[8];
-                z2[9] = w12_mul_test_img[9] + b12[9];
-                z2[10] = w12_mul_test_img[10] + b12[10];
-                z2[11] = w12_mul_test_img[11] + b12[11];
-                z2[12] = w12_mul_test_img[12] + b12[12];
-                z2[13] = w12_mul_test_img[13] + b12[13];
-                z2[14] = w12_mul_test_img[14] + b12[14];
-                z2[15] = w12_mul_test_img[15] + b12[15];
-                z2[16] = w12_mul_test_img[16] + b12[16];
-                z2[17] = w12_mul_test_img[17] + b12[17];
-                z2[18] = w12_mul_test_img[18] + b12[18];
-                z2[19] = w12_mul_test_img[19] + b12[19];
-                z2[20] = w12_mul_test_img[20] + b12[20];
-                z2[21] = w12_mul_test_img[21] + b12[21];
-                z2[22] = w12_mul_test_img[22] + b12[22];
-                z2[23] = w12_mul_test_img[23] + b12[23];
-                z2[24] = w12_mul_test_img[24] + b12[24];
-                z2[25] = w12_mul_test_img[25] + b12[25];
-                z2[26] = w12_mul_test_img[26] + b12[26];
-                z2[27] = w12_mul_test_img[27] + b12[27];
-                z2[28] = w12_mul_test_img[28] + b12[28];
-                z2[29] = w12_mul_test_img[29] + b12[29];
-                z2[30] = w12_mul_test_img[30] + b12[30];
-                z2[31] = w12_mul_test_img[31] + b12[31];
-                z2[32] = w12_mul_test_img[32] + b12[32];
-                z2[33] = w12_mul_test_img[33] + b12[33];
-                z2[34] = w12_mul_test_img[34] + b12[34];
-                z2[35] = w12_mul_test_img[35] + b12[35];
-                z2[36] = w12_mul_test_img[36] + b12[36];
-                z2[37] = w12_mul_test_img[37] + b12[37];
-                z2[38] = w12_mul_test_img[38] + b12[38];
-                z2[39] = w12_mul_test_img[39] + b12[39];
-            
-                count = 0;
-                next_state = RELU_STAGE1; //B12 addition done. Now, go to RELU state            
-            end
-            
-            RELU_STAGE1: begin
-                if ( count == 40 ) begin
-                    count = 0;
-                    next_state = W23_MULTIPLY; //RELU done. Now, go to prediction state
-                end
-                else begin    
-                //LEAKY RELU
-                if (z2[count]>0) begin
-                    a2[count] = z2[count] * $signed(relu_multiply_1);   //Multiply by 1
-                end
-                else begin
-                    a2[count] = z2[count] * $signed(relu_multiply_slope);  //Multiply with Slope
-                end
-            
-                count = count+1;
-                end              
-            end
-            
-            W23_MULTIPLY: begin
-
-                if ( count == 40 ) begin
-                    count = 0;
-                    next_state = B23_ADDITION;
-                end
-                else begin    
-                //Multiply w23  a2
-                w23_mul_a2[0]  = w23_mul_a2[0] + w23[0][count]*a2[count];
-                w23_mul_a2[1]  = w23_mul_a2[1] + w23[1][count]*a2[count];
-                w23_mul_a2[2]  = w23_mul_a2[2] + w23[2][count]*a2[count];
-                w23_mul_a2[3]  = w23_mul_a2[3] + w23[3][count]*a2[count];
-                w23_mul_a2[4]  = w23_mul_a2[4] + w23[4][count]*a2[count];
-                w23_mul_a2[5]  = w23_mul_a2[5] + w23[5][count]*a2[count];
-                w23_mul_a2[6]  = w23_mul_a2[6] + w23[6][count]*a2[count];
-                w23_mul_a2[7]  = w23_mul_a2[7] + w23[7][count]*a2[count];
-                w23_mul_a2[8]  = w23_mul_a2[8] + w23[8][count]*a2[count];
-                w23_mul_a2[9]  = w23_mul_a2[9] + w23[9][count]*a2[count];
-            
-                count = count+1;
-                end              
-            end
-            
-            B23_ADDITION: begin
-                //Add Biases from B23
-                z3[0] = w23_mul_a2[0] + b23_shifted[0];
-                z3[1] = w23_mul_a2[1] + b23_shifted[1];
-                z3[2] = w23_mul_a2[2] + b23_shifted[2];
-                z3[3] = w23_mul_a2[3] + b23_shifted[3];
-                z3[4] = w23_mul_a2[4] + b23_shifted[4];
-                z3[5] = w23_mul_a2[5] + b23_shifted[5];
-                z3[6] = w23_mul_a2[6] + b23_shifted[6];
-                z3[7] = w23_mul_a2[7] + b23_shifted[7];
-                z3[8] = w23_mul_a2[8] + b23_shifted[8];
-                z3[9] = w23_mul_a2[9] + b23_shifted[9];
-            
-                count = 0;
-                next_state = RELU_STAGE2; //B23 addition done. Now, go to RELU state
-            end
-            
-            RELU_STAGE2: begin
-                if ( count == 10 ) begin
-                    count = 0;
-                    max_a3 = a3[count];
-                    next_state = PREDICTION; //RELU done. Now, go to prediction state
-                end
-                else begin    
-                    //LEAKY RELU
-                    if (z3[count]>0) begin
-                        a3[count] = z3[count] * $signed(relu_multiply_1);  //Multiply by 1
-                    end
-                    else begin
-                        a3[count] = z3[count] * $signed(relu_multiply_slope);  //Multiply with Slope
-                    end
-                
-                    count = count+1;
-                end               
-            end
-            
-            PREDICTION: begin
-                if ( count == 10 ) begin
-                    count = 0;
-                    predicted_val = max_index;
-                    next_state = FINISHED; //MAX find done. Now, go to FINISHED state
-                end
-                else begin    
-               //Find the MAX 
-                if (a3[count] >= max_a3) begin
-                    max_a3 = a3[count];
-                    max_index = count;
-                end
-               
-                count = count+1;
-                end  
-            end
-            
-            FINISHED: begin
-                done = 1'b1;
-                next_state = IDLE;
-            end
-            
-            default:     next_state = IDLE;
-            
-        endcase	
     end
 end
 
+// B12_ADDITION
+always@(posedge clk)
+begin
+    if(rst_on_start == 1)
+    begin
+        z2[0] <= 17'd0;
+        z2[1] <= 17'd0;
+        z2[2] <= 17'd0;
+        z2[3] <= 17'd0;
+        z2[4] <= 17'd0;
+        z2[5] <= 17'd0;
+        z2[6] <= 17'd0;
+        z2[7] <= 17'd0;
+        z2[8] <= 17'd0;
+        z2[9] <= 17'd0;
+        z2[10] <= 17'd0;
+        z2[11] <= 17'd0;
+        z2[12] <= 17'd0;
+        z2[13] <= 17'd0;
+        z2[14] <= 17'd0;
+        z2[15] <= 17'd0;
+        z2[16] <= 17'd0;
+        z2[17] <= 17'd0;
+        z2[18] <= 17'd0;
+        z2[19] <= 17'd0;
+        z2[20] <= 17'd0;
+        z2[21] <= 17'd0;
+        z2[22] <= 17'd0;
+        z2[23] <= 17'd0;
+        z2[24] <= 17'd0;
+        z2[25] <= 17'd0;
+        z2[26] <= 17'd0;
+        z2[27] <= 17'd0;
+        z2[28] <= 17'd0;
+        z2[29] <= 17'd0;
+        z2[30] <= 17'd0;
+        z2[31] <= 17'd0;
+        z2[32] <= 17'd0;
+        z2[33] <= 17'd0;
+        z2[34] <= 17'd0;
+        z2[35] <= 17'd0;
+        z2[36] <= 17'd0;
+        z2[37] <= 17'd0;
+        z2[38] <= 17'd0;
+        z2[39] <= 17'd0;
+    end
+    else if(do_add_b12 == 1)
+    begin
+        z2[0] <= w12_mul_test_img[0] + b12[0];
+        z2[1] <= w12_mul_test_img[1] + b12[1];
+        z2[2] <= w12_mul_test_img[2] + b12[2];
+        z2[3] <= w12_mul_test_img[3] + b12[3];
+        z2[4] <= w12_mul_test_img[4] + b12[4];
+        z2[5] <= w12_mul_test_img[5] + b12[5];
+        z2[6] <= w12_mul_test_img[6] + b12[6];
+        z2[7] <= w12_mul_test_img[7] + b12[7];
+        z2[8] <= w12_mul_test_img[8] + b12[8];
+        z2[9] <= w12_mul_test_img[9] + b12[9];
+        z2[10] <= w12_mul_test_img[10] + b12[10];
+        z2[11] <= w12_mul_test_img[11] + b12[11];
+        z2[12] <= w12_mul_test_img[12] + b12[12];
+        z2[13] <= w12_mul_test_img[13] + b12[13];
+        z2[14] <= w12_mul_test_img[14] + b12[14];
+        z2[15] <= w12_mul_test_img[15] + b12[15];
+        z2[16] <= w12_mul_test_img[16] + b12[16];
+        z2[17] <= w12_mul_test_img[17] + b12[17];
+        z2[18] <= w12_mul_test_img[18] + b12[18];
+        z2[19] <= w12_mul_test_img[19] + b12[19];
+        z2[20] <= w12_mul_test_img[20] + b12[20];
+        z2[21] <= w12_mul_test_img[21] + b12[21];
+        z2[22] <= w12_mul_test_img[22] + b12[22];
+        z2[23] <= w12_mul_test_img[23] + b12[23];
+        z2[24] <= w12_mul_test_img[24] + b12[24];
+        z2[25] <= w12_mul_test_img[25] + b12[25];
+        z2[26] <= w12_mul_test_img[26] + b12[26];
+        z2[27] <= w12_mul_test_img[27] + b12[27];
+        z2[28] <= w12_mul_test_img[28] + b12[28];
+        z2[29] <= w12_mul_test_img[29] + b12[29];
+        z2[30] <= w12_mul_test_img[30] + b12[30];
+        z2[31] <= w12_mul_test_img[31] + b12[31];
+        z2[32] <= w12_mul_test_img[32] + b12[32];
+        z2[33] <= w12_mul_test_img[33] + b12[33];
+        z2[34] <= w12_mul_test_img[34] + b12[34];
+        z2[35] <= w12_mul_test_img[35] + b12[35];
+        z2[36] <= w12_mul_test_img[36] + b12[36];
+        z2[37] <= w12_mul_test_img[37] + b12[37];
+        z2[38] <= w12_mul_test_img[38] + b12[38];
+        z2[39] <= w12_mul_test_img[39] + b12[39];        
+    end
+end
+
+// RELU_STAGE1
+always@(posedge clk)
+begin
+    if(rst_on_start == 1)
+    begin
+        a2[0] <= 33'd0;
+        a2[1] <= 33'd0;
+        a2[2] <= 33'd0;
+        a2[3] <= 33'd0;
+        a2[4] <= 33'd0;
+        a2[5] <= 33'd0;
+        a2[6] <= 33'd0;
+        a2[7] <= 33'd0;
+        a2[8] <= 33'd0;
+        a2[9] <= 33'd0;
+        a2[10] <= 33'd0;
+        a2[11] <= 33'd0;
+        a2[12] <= 33'd0;
+        a2[13] <= 33'd0;
+        a2[14] <= 33'd0;
+        a2[15] <= 33'd0;
+        a2[16] <= 33'd0;
+        a2[17] <= 33'd0;
+        a2[18] <= 33'd0;
+        a2[19] <= 33'd0;
+        a2[20] <= 33'd0;
+        a2[21] <= 33'd0;
+        a2[22] <= 33'd0;
+        a2[23] <= 33'd0;
+        a2[24] <= 33'd0;
+        a2[25] <= 33'd0;
+        a2[26] <= 33'd0;
+        a2[27] <= 33'd0;
+        a2[28] <= 33'd0;
+        a2[29] <= 33'd0;
+        a2[30] <= 33'd0;
+        a2[31] <= 33'd0;
+        a2[32] <= 33'd0;
+        a2[33] <= 33'd0;
+        a2[34] <= 33'd0;
+        a2[35] <= 33'd0;
+        a2[36] <= 33'd0;
+        a2[37] <= 33'd0;
+        a2[38] <= 33'd0;
+        a2[39] <= 33'd0;
+    end
+    else if(do_RELU_1 == 1)
+    begin
+        if(z2[count][0] == 0)
+            begin
+                a2[count] <= z2[count] * $signed(relu_multiply_1);   //Multiply by 1                  
+            end
+        else
+            begin
+                a2[count] <= z2[count] * $signed(relu_multiply_slope);  //Multiply with Slope
+            end
+    end
+end
+
+// W23_MULTIPLY
+always@(posedge clk)
+begin
+    if(rst_on_start == 1)
+    begin
+        w23_mul_a2[0] <= 49'd0;
+        w23_mul_a2[1] <= 49'd0;
+        w23_mul_a2[2] <= 49'd0;
+        w23_mul_a2[3] <= 49'd0;
+        w23_mul_a2[4] <= 49'd0;
+        w23_mul_a2[5] <= 49'd0;
+        w23_mul_a2[6] <= 49'd0;
+        w23_mul_a2[7] <= 49'd0;
+        w23_mul_a2[8] <= 49'd0;
+        w23_mul_a2[9] <= 49'd0;
+    end
+    else if(do_w23_mul_a2 == 1)
+    begin
+        w23_mul_a2[0] <= w23_mul_a2[0] + w23[0][count] * a2[count];
+        w23_mul_a2[1] <= w23_mul_a2[1] + w23[1][count] * a2[count];
+        w23_mul_a2[2] <= w23_mul_a2[2] + w23[2][count] * a2[count];
+        w23_mul_a2[3] <= w23_mul_a2[3] + w23[3][count] * a2[count];
+        w23_mul_a2[4] <= w23_mul_a2[4] + w23[4][count] * a2[count];
+        w23_mul_a2[5] <= w23_mul_a2[5] + w23[5][count] * a2[count];
+        w23_mul_a2[6] <= w23_mul_a2[6] + w23[6][count] * a2[count];
+        w23_mul_a2[7] <= w23_mul_a2[7] + w23[7][count] * a2[count];
+        w23_mul_a2[8] <= w23_mul_a2[8] + w23[8][count] * a2[count];
+        w23_mul_a2[9] <= w23_mul_a2[9] + w23[9][count] * a2[count];
+    end
+end
+
+
+// B23_ADDITION
+always@(posedge clk)
+begin
+    if(rst_on_start == 1)
+    begin
+        z3[0] <= 49'd0;
+        z3[1] <= 49'd0;
+        z3[2] <= 49'd0;
+        z3[3] <= 49'd0;
+        z3[4] <= 49'd0;
+        z3[5] <= 49'd0;
+        z3[6] <= 49'd0;
+        z3[7] <= 49'd0;
+        z3[8] <= 49'd0;
+        z3[9] <= 49'd0;
+    end
+    else if(do_add_b23 == 1)
+    begin
+        z3[0] <= w23_mul_a2[0] + b23_shifted[0];
+        z3[1] <= w23_mul_a2[1] + b23_shifted[1];
+        z3[2] <= w23_mul_a2[2] + b23_shifted[2];
+        z3[3] <= w23_mul_a2[3] + b23_shifted[3];
+        z3[4] <= w23_mul_a2[4] + b23_shifted[4];
+        z3[5] <= w23_mul_a2[5] + b23_shifted[5];
+        z3[6] <= w23_mul_a2[6] + b23_shifted[6];
+        z3[7] <= w23_mul_a2[7] + b23_shifted[7];
+        z3[8] <= w23_mul_a2[8] + b23_shifted[8];
+        z3[9] <= w23_mul_a2[9] + b23_shifted[9];
+    end
+end
+
+// RELU_STAGE2
+always@(posedge clk)
+begin
+    if(rst_on_start == 1)
+    begin
+        a3[0] <= 65'd0;
+        a3[1] <= 65'd0;
+        a3[2] <= 65'd0;
+        a3[3] <= 65'd0;
+        a3[4] <= 65'd0;
+        a3[5] <= 65'd0;
+        a3[6] <= 65'd0;
+        a3[7] <= 65'd0;
+        a3[8] <= 65'd0;
+        a3[9] <= 65'd0;
+    end
+    else if(do_RELU_2 == 1)
+    begin
+        if(z3[count][0] == 0)
+        begin
+            a3[count] <= z3[count] * $signed(relu_multiply_1);  //Multiply by 1                  
+        end
+        else
+        begin
+            a3[count] <= z3[count] * $signed(relu_multiply_slope);  //Multiply with Slope
+        end
+    end
+end
+
+// PREDICTION
+always@(posedge clk)
+begin
+
+    if(rst_on_start == 1)
+    begin
+        max_index  <= 4'd0;
+        max_a3 <= 64'd0;
+    end
+    else if(do_find_max == 1)
+    begin
+
+        if(count == 0)
+        begin
+            max_a3 <= a3[0];
+        end
+
+        if(a3[count+1] >= max_a3)
+        begin
+            max_index <= count + 1;
+            max_a3 <= a3[count+1];
+        end
+    end
+end
 
 //    *******************************  END OF Code flow  *******************************    
 
@@ -11068,17 +11303,16 @@ assign b23[8] = -16'd204;
 assign b23[9] = -16'd69;
 
 //Shift existing Q.8 point by 16 bits to get Q.24 
-assign b23_shifted[0] = b23[0] <<< 16;
-assign b23_shifted[1] = b23[1] <<< 16;
-assign b23_shifted[2] = b23[2] <<< 16;
-assign b23_shifted[3] = b23[3] <<< 16;
-assign b23_shifted[4] = b23[4] <<< 16;
-assign b23_shifted[5] = b23[5] <<< 16;
-assign b23_shifted[6] = b23[6] <<< 16;
-assign b23_shifted[7] = b23[7] <<< 16;
-assign b23_shifted[8] = b23[8] <<< 16;
-assign b23_shifted[9] = b23[9] <<< 16;
-
+assign b23_shifted[0] = b23[0]<<<16;
+assign b23_shifted[1] = b23[1]<<<16;
+assign b23_shifted[2] = b23[2]<<<16;
+assign b23_shifted[3] = b23[3]<<<16;
+assign b23_shifted[4] = b23[4]<<<16;
+assign b23_shifted[5] = b23[5]<<<16;
+assign b23_shifted[6] = b23[6]<<<16;
+assign b23_shifted[7] = b23[7]<<<16;
+assign b23_shifted[8] = b23[8]<<<16;
+assign b23_shifted[9] = b23[9]<<<16;
 
 
 
