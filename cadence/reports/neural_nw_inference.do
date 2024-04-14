@@ -6,9 +6,11 @@ read design ../synthesis/neural_nw_inference_netlist.v -verilog -revised
 //add pin constraints 0 SE  -revised
 //add ignored inputs scan_in -revised
 //add ignored outputs scan_out -revised
+
 set system mode lec
 add compare point -all
 compare
+analyze datapath -effort high
 report verification 
 
 

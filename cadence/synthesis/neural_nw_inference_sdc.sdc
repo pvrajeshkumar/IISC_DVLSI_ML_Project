@@ -1,6 +1,6 @@
 # ####################################################################
 
-#  Created by Genus(TM) Synthesis Solution 21.12-s068_1 on Mon Apr 08 13:14:25 UTC 2024
+#  Created by Genus(TM) Synthesis Solution 21.12-s068_1 on Sun Apr 14 10:49:59 UTC 2024
 
 # ####################################################################
 
@@ -17,7 +17,6 @@ set_clock_transition 0.1 [get_clocks clk]
 set_clock_gating_check -setup 0.0 
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports rst]
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports start]
-set_output_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports done]
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {test_img[0]}]
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {test_img[1]}]
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {test_img[2]}]
@@ -274,6 +273,7 @@ set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {test_img
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {test_img[253]}]
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {test_img[254]}]
 set_input_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {test_img[255]}]
+set_output_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports done]
 set_output_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {predicted_val[0]}]
 set_output_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {predicted_val[1]}]
 set_output_delay -clock [get_clocks clk] -add_delay -max 1.0 [get_ports {predicted_val[2]}]

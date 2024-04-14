@@ -10,8 +10,12 @@ set_attribute syn_generic_effort low /
 
 set_attribute information_level 2 /
 set_attribute optimize_constant_0_flops false /
-set_attribute optimize_constant_1_flops false /
 set_attribute optimize_constant_feedback_seqs false /
+
+set_attribute delete_unloaded_seqs false /
+set_attribute delete_unloaded_insts false /
+set_attribute delete_flops_on_preserved_net true /
+set_attribute delete_hier_insts_on_preserved_net true /
 
 syn_generic
 set_attribute syn_map_effort low /
@@ -28,3 +32,4 @@ report_power > power.rpt
 gui_show
 
 #exit
+
